@@ -10,12 +10,21 @@ jobs:
     name: Check for Native Code Updates
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Check for native code changes
-        run: |
-          if git diff --name-only HEAD~1 | grep -E '^(ios|android|package.json|Podfile|build.gradle|settings.gradle)'; then
-            echo "::set-output name=native-changes::true"
-          else
-            echo "::set-output name=native-changes::false"
-          fi
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Git
+      run: |
+        git fetch origin ${{ github.event.pull_request.base.ref }}
+
+    - name: Check for changes in package.json
+      run: |
+        BASE_BRANCH="${{ github.event.pull_request.base.ref }}"
+        CHANGED_FILES=$(git diff --name-only origin/$BASE_BRANCH...HEAD)
+        
+        if echo "$CHANGED_FILES" | grep '^package\.json$'; then
+          echo "package.json has changed"
+          exit 1
+        else
+          echo "package.json has not changed"
+        fi
