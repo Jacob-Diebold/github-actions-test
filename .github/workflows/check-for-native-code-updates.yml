@@ -20,7 +20,7 @@ jobs:
     - name: Check for changes in package.json
       run: |
         BASE_BRANCH="${{ github.event.pull_request.base.ref }}"
-        CHANGED_FILES=$(git diff --name-only origin/$BASE_BRANCH...HEAD)
+        CHANGED_FILES=$(git diff --name-only origin/$BASE_BRANCH)
         
         if echo "$CHANGED_FILES" | grep '^package\.json$'; then
           echo "package.json has changed"
