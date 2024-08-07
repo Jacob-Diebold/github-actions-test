@@ -35,18 +35,10 @@ jobs:
           echo "$PR_BODY" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
       
-      - name: Open PR
-        uses: ./.github/actions/open-pr
-        with:
-          branch-with-changes: ${{github.ref_name}}
-          target-branch: main
-          pr-title: 'Merge ${{github.ref_name}} into main'
-          pr-body: ${{env.PR_BODY}}
-
-      # - name: create pull request
-      #   run: gh pr create -B main -H ${{github.ref_name}} --title 'Merge ${{github.ref_name}} into main' --body '${{env.PR_BODY}}'
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: create pull request
+        run: gh pr create -B main -H ${{github.ref_name}} --title 'Merge ${{github.ref_name}} into main' --body '${{env.PR_BODY}}'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
   # open-develop-pr:
