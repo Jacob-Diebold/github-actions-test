@@ -32,7 +32,8 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: "main"
-          title: "Auto PR from ${GITHUB_REF#refs/heads/}"
+          base: ${{ github.ref_name }}
+          title: "Auto PR from ${{ github.ref_name }}"
           body: ${{ steps.main-pr-template.outputs.result }}
           # Set the branch to the current branch
   # open-develop-pr:
