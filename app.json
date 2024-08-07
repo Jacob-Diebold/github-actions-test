@@ -4,5 +4,6 @@
     "ios": {
       "buildNumber": "0"
     }
-  }
+  },
+  "testCommits": 1
 }
