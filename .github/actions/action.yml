@@ -17,9 +17,6 @@ outputs:
 runs:
   using: composite
   steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
     - name: Generate random number
       id: random-number
       run: echo "RANDOM_NUMBER=$(($RANDOM % 10000))" >> $GITHUB_ENV
