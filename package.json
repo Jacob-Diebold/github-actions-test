@@ -6,10 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "echo \"Running eslint...\"",
-    "prettier": "echo \"Running prettier...\"",
-    "bump-version:major": "",
-    "bump-version:minor": "",
-    "bump-version:patch": ""
+    "prettier": "echo \"Running prettier...\""
   },
   "author": "",
   "license": "ISC",
