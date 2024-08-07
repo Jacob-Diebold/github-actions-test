@@ -31,8 +31,8 @@ jobs:
         uses: peter-evans/create-pull-request@v6.1.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          branch: "main"
-          base: ${{ github.ref_name }}
+          base: "main"
+          branch: ${{ github.ref_name }}
           title: "Auto PR from ${{ github.ref_name }}"
           body: ${{ steps.main-pr-template.outputs.result }}
           draft: true
