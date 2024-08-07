@@ -7,7 +7,7 @@ on:
 
 jobs:
   check-native-code:
-    name: Check for Native Code Updates
+    name: Checking Changed Files
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
