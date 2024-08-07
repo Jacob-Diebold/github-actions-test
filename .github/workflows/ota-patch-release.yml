@@ -26,7 +26,7 @@ jobs:
         with:
           template: .github/templates/pr-patch-to-main.md
           vars: |
-            branch-name: ${{ github.ref_name }}
+            branchName: ${{ github.ref_name }}
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6.1.0
         with:
