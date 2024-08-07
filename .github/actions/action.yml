@@ -12,14 +12,19 @@ inputs:
 outputs:
   pr-body-file-env-name:
     description: The file path of the rendered PR body file
-
+    value: ${{ steps.return-pr-body-file-path.outputs.pr-body-file-env-name }}
 
 runs:
   using: composite
   steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
     - name: Generate random number
       id: random-number
       run: echo "RANDOM_NUMBER=$(($RANDOM % 10000))" >> $GITHUB_ENV
+      shell: bash
+
     - name: Render PR template
       id: pr-body-template
       uses: chuhlomin/render-template@v1.4
@@ -30,3 +35,4 @@ runs:
     - name: Return PR body file path
       id: return-pr-body-file-path
       run: echo "pr-body-file-env-name=${{ env.RANDOM_NUMBER }}-rendered-md.md" >> $GITHUB_OUTPUT
+      shell: bash
