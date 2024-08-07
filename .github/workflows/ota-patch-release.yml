@@ -31,11 +31,11 @@ jobs:
         uses: peter-evans/create-pull-request@v6.1.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          base: main
+          branch: main
           title: "Auto PR from ${GITHUB_REF#refs/heads/}"
           body: ${{ steps.main-pr-template.outputs.result }}
           # Set the branch to the current branch
-          branch: ${{ github.ref_name }}
+          base: ${{ github.ref_name }}
   # open-develop-pr:
   #   name: Open Develop PR
   #   runs-on: ubuntu-latest
