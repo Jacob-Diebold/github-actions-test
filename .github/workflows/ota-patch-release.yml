@@ -32,7 +32,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           base: "main"
-          branch: ${{ github.ref_name }}
+          # branch: ${{ github.ref_name }}
           title: "Auto PR from ${{ github.ref_name }}"
           body: ${{ steps.main-pr-template.outputs.result }}
           draft: true
