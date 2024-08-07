@@ -36,7 +36,7 @@ jobs:
           echo "EOF" >> $GITHUB_ENV
       
       - name: create pull request
-        run: gh pr create -B main -H ${{github.ref_name}} --title 'Merge ${{github.ref_name}} into main' --body '${{env.PR_BODY}}'
+        run: gh pr create -B main -H ${{github.ref_name}} --title 'Merge ${{github.ref_name}} into main-2' --body '${{env.PR_BODY}}'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
