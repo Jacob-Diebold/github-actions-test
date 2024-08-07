@@ -27,15 +27,21 @@ jobs:
           template: .github/templates/pr-patch-to-main.md
           vars: |
             branchName: TESTING
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v6.1.0
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          base: "main"
-          # branch: ${{ github.ref_name }}
-          title: "Auto PR from ${{ github.ref_name }}"
-          body: ${{ steps.main-pr-template.outputs.result }}
-          # Set the branch to the current branch
+      - name: create pull request
+        run: gh pr create -B main -H ${{github.ref_name}} --title 'Merge branch_to_merge into base_branch' --body 'Created by Github action'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Create Pull Request
+      #   uses: peter-evans/create-pull-request@v6.1.0
+      #   with:
+      #     token: ${{ secrets.GITHUB_TOKEN }}
+      #     base: "main"
+      #     # branch: ${{ github.ref_name }}
+      #     title: "Auto PR from ${{ github.ref_name }}"
+      #     body: ${{ steps.main-pr-template.outputs.result }}
+
+
+
   # open-develop-pr:
   #   name: Open Develop PR
   #   runs-on: ubuntu-latest
