@@ -20,21 +20,36 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Render PR template
-        id: main-pr-template
-        uses: chuhlomin/render-template@v1.4
+      # - name: Render PR template
+      #   id: main-pr-template
+      #   uses: chuhlomin/render-template@v1.4
+      #   with:
+      #     template: .github/templates/pr-patch-to-main.md
+      #     result_path: pr-patch-to-main.md
+      #     vars: |
+      #       branchName: TESTING
+      # - name: Read PR body from file
+      #   id: read_pr_body
+      #   run: |
+      #     PR_BODY=$(cat pr-patch-to-main.md)
+      #     echo "PR_BODY<<EOF" >> $GITHUB_ENV
+      #     echo "$PR_BODY" >> $GITHUB_ENV
+      #     echo "EOF" >> $GITHUB_ENV
+      - name: Write PR body
+        id: write-pr-body
+        uses: ./.github/actions/write-pr-body
         with:
           template: .github/templates/pr-patch-to-main.md
-          result_path: pr-patch-to-main.md
           vars: |
             branchName: TESTING
       - name: Read PR body from file
         id: read_pr_body
         run: |
-          PR_BODY=$(cat pr-patch-to-main.md)
+          PR_BODY=$(cat ${{ steps.write-pr-body.outputs.pr-body-file-env-name }})
           echo "PR_BODY<<EOF" >> $GITHUB_ENV
           echo "$PR_BODY" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
+
       - name: create pull request
         run: gh pr create -B main -H ${{github.ref_name}} --title 'Merge ${{github.ref_name}} into main' --body '${{env.PR_BODY}}'
         env:

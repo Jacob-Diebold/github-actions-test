@@ -1,0 +1,43 @@
+name : Write PR Body
+description : Writes the PR body given a list of variables and a template file
+
+inputs:
+  template:
+    description: The path to the template file
+    required: true
+  vars:
+    description: The variables to use in the template
+    required: true
+
+outputs:
+  pr-body-file-env-name:
+    description: The env name of the rendered PR body file
+
+runs:
+  using: composite
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Generate random number
+      id: random-number
+      run: echo "RANDOM_NUMBER=$(($RANDOM % 10000))" >> $GITHUB_ENV
+    - name: Render PR template
+      id: pr-body-template
+      uses: chuhlomin/render-template@v1.4
+      with:
+        template: ${{ inputs.template }}
+        vars: ${{ inputs.vars }}
+        result_path: "${{ env.RANDOM_NUMBER }}-rendered-md.md"
+    - name: Read PR body from file
+      id: read_pr_body
+      run: |
+        PR_BODY=$(cat ${{ env.RANDOM_NUMBER }}-rendered-md.md)
+        echo "${{env.RANDOM_NUMBER_RENDERED}}<<EOF" >> $GITHUB_ENV
+        echo "${{env.RANDOM_NUMBER_RENDERED}}" >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
+    # Return the github env name of the rendered PR body file
+    - name: Return PR body file env name
+      id: pr-body-file-env-name
+      run: echo "pr-body-file-env-name=${{env.RANDOM_NUMBER_RENDERED}}" >> $GITHUB_OUTPUT
+        
+
