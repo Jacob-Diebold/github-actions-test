@@ -37,7 +37,7 @@ jobs:
       #     echo "EOF" >> $GITHUB_ENV
       - name: Write PR body
         id: write-pr-body
-        uses: ./.github/actions/action.yml
+        uses: ./.github/actions/write-pr-body
         with:
           template: .github/templates/pr-patch-to-main.md
           vars: |
