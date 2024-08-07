@@ -34,7 +34,6 @@ jobs:
           branch: main
           title: "Auto PR from ${GITHUB_REF#refs/heads/}"
           body: ${{ steps.main-pr-template.outputs.result }}
-          draft: true
   # open-develop-pr:
   #   name: Open Develop PR
   #   runs-on: ubuntu-latest
