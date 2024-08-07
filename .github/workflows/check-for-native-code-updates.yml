@@ -28,3 +28,14 @@ jobs:
         else
           echo "package.json has not changed"
         fi
+    - name: Check for changes in app.json
+      run: |
+        BASE_BRANCH="${{ github.event.pull_request.base.ref }}"
+        CHANGED_FILES=$(git diff --name-only origin/$BASE_BRANCH)
+        
+        if echo "$CHANGED_FILES" | grep '^app\.json$'; then
+          echo "app.json has changed"
+          exit 1
+        else
+          echo "app.json has not changed"
+        fi

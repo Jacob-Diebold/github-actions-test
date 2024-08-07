@@ -6,13 +6,15 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "echo \"Running eslint...\"",
-    "prettier": "echo \"Running prettier...\""
+    "prettier": "echo \"Running prettier...\"",
+    "bump-version:major": "",
+    "bump-version:minor": "",
+    "bump-version:patch": ""
   },
   "author": "",
   "license": "ISC",
   "type": "module",
   "devDependencies": {
-    "@commitlint/cli": "^19.3.0",
     "eslint": "^9.8.0",
     "prettier": "^3.3.3"
   }
