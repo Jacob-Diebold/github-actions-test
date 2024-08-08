@@ -1,0 +1,23 @@
+name: On Prod Update from Release Candidate
+
+on:
+  push:
+    branches:
+      main
+
+jobs:
+  submit-prod-build:
+    name: Submit Prod Build if needed
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Submit Prod Build if coming from release candidate branch
+        if: startsWith(github.ref, 'refs/heads/rc-v')
+        uses: ./.github/actions/submit-build
+        with:
+          expo-token: ${{ secrets.EXPO_TOKEN }}
+          release-channel: production
+
+      # TODO: Add action to increment version by a minor update and create a new release candidate branch

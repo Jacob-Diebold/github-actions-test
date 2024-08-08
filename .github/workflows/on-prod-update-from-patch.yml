@@ -1,0 +1,22 @@
+name: On Prod Update from Patch
+
+on:
+  push:
+    branches:
+      main
+
+jobs:
+  release-ota:
+    name: Release Prod OTA if needed
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Submit OTA if coming from patch branch
+        if: startsWith(github.ref, 'refs/heads/patch-v')
+        uses: ./.github/actions/submit-ota
+        with:
+          expo-token: ${{ secrets.EXPO_TOKEN }}
+          release-channel: production
+          release-message: ${{ github.event.pull_request.title }}
