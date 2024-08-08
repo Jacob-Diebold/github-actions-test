@@ -1,0 +1,39 @@
+name: Open PR
+description: Opens a pull request
+inputs:
+  template:
+    description: The path to the template file
+    required: true
+  github-token:
+    description: The GitHub token
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Write PR body
+      id: write-pr-body
+      uses: ./.github/actions/write-pr-body
+      with:
+        template: ${{ inputs.template }}
+        vars: |
+          branchName: TESTING
+    - name: Read PR body from file
+      id: read_pr_body
+      run: |
+        PR_BODY=$(cat ${{ steps.write-pr-body.outputs.pr-body-file-env-name }})
+        echo "PR_BODY<<EOF" >> $GITHUB_ENV
+        echo "$PR_BODY" >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
+      shell: bash
+
+    # TODO: Check if a PR already exists for this branch
+
+    # TODO: If it does, edit the body to include the new changes as well
+
+    # If not, create a PR
+    - name: Create Pull Request
+      run: gh pr create -B main -H ${{github.ref_name}} --title 'Merge ${{github.ref_name}} into main' --body '${{env.PR_BODY}}'
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+      shell: bash
