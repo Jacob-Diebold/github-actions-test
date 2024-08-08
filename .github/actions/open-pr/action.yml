@@ -7,6 +7,12 @@ inputs:
   github-token:
     description: The GitHub token
     required: true
+  base-branch:
+    description: The base branch for the pull request
+    required: true
+  branch-with-changes:
+    description: The branch with the changes
+    required: true
 
 runs:
   using: composite
@@ -33,7 +39,7 @@ runs:
 
     # If not, create a PR
     - name: Create Pull Request
-      run: gh pr create -B main -H ${{github.ref_name}} --title 'Merge ${{github.ref_name}} into main' --body '${{env.PR_BODY}}'
+      run: gh pr create -B ${{inputs.base-branch}} -H ${{inputs.branch-with-changes}} --title 'Merge ${{inputs.branch-with-changes}} into ${{inputs.base-branch}}' --body '${{env.PR_BODY}}'
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
       shell: bash

@@ -1,0 +1,28 @@
+name: Check Branch Creation
+description: Checks if the creation event is a branch creation and is for a release candidate branch
+
+
+outputs:
+  result:
+    description: The result of the check (true or false)
+    value: ${{ steps.check-branch-creation.outputs.result }}
+
+runs:
+  using: composite
+  steps:
+    - name: Check if the creation event is for a branch
+      id: check-branch-creation
+      run: |
+        if [ "${{ github.event.ref_type }}" != "branch" ]; then
+          echo "Not a branch creation event, skipping"
+          echo "result=false" >> $GITHUB_OUTPUT
+        else
+          if [[ "${{ github.ref_name }}" =~ ^rc-.* ]]; then
+            echo "Branch name starts with 'rc-', creating release candidate branch"
+            echo "result=true" >> $GITHUB_OUTPUT
+          else
+            echo "Branch name does not start with 'rc-', skipping"
+            echo "result=false" >> $GITHUB_OUTPUT
+          fi
+        fi
+      shell: bash
