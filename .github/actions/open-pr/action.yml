@@ -17,7 +17,7 @@ runs:
       with:
         template: ${{ inputs.template }}
         vars: |
-          branchName: TESTING
+          branchName: TESTING123
     - name: Read PR body from file
       id: read_pr_body
       run: |
