@@ -13,7 +13,7 @@ runs:
   steps:
     - name: Write PR body
       id: write-pr-body
-      uses: ./.github/actions/write-pr-body
+      uses: ./.github/actions/open-pr/write-pr-body
       with:
         template: ${{ inputs.template }}
         vars: |

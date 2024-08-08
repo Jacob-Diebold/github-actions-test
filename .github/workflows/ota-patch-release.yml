@@ -25,43 +25,6 @@ jobs:
         with:
           template: .github/templates/pr-patch-to-main.md
           github-token: ${{ secrets.GITHUB_TOKEN }}
-      # - name: Write PR body
-      #   id: write-pr-body
-      #   uses: ./.github/actions/write-pr-body
-      #   with:
-      #     template: .github/templates/pr-patch-to-main.md
-      #     vars: |
-      #       branchName: TESTING
-      # - name: Read PR body from file
-      #   id: read_pr_body
-      #   run: |
-      #     PR_BODY=$(cat ${{ steps.write-pr-body.outputs.pr-body-file-env-name }})
-      #     echo "PR_BODY<<EOF" >> $GITHUB_ENV
-      #     echo "$PR_BODY" >> $GITHUB_ENV
-      #     echo "EOF" >> $GITHUB_ENV
-
-
-      # # TODO: Check if a PR already exists for this branch
-
-      # # TODO: If it does, edit the body to include the new changes as well
-
-      # # If not, create a PR
-      # - name: create pull request
-      #   run: gh pr create -B main -H ${{github.ref_name}} --title 'Merge ${{github.ref_name}} into main' --body '${{env.PR_BODY}}'
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-
-  # open-develop-pr:
-  #   name: Open Develop PR
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-  #     # Open a PR to develop
-  #     - name: Create Pull Request
-  #       uses: peter-evans/create-pull-request@v6.1.0
-  #       with:
 
   
 
