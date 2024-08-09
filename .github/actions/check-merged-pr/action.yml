@@ -26,18 +26,18 @@ runs:
 
     - name: Check if base branch starts with expected prefix
       id: check-base
-      if: startsWith(github.event.pull_request.base.ref, inputs.expected-base-branch)
+      if: startsWith(github.event.pull_request.base.ref, inputs.expected-base-branch-prefix)
       run: |
         echo "Base branch: ${{ github.event.pull_request.base.ref }}"
-        echo "Expected base branch prefix: ${{ inputs.expected-base-branch }}"
+        echo "Expected base branch prefix: ${{ inputs.expected-base-branch-prefix }}"
       shell: bash
 
     - name: Check if head branch starts with expected prefix
       id: check-head
-      if: startsWith(github.event.pull_request.head.ref, inputs.expected-head-branch)
+      if: startsWith(github.event.pull_request.head.ref, inputs.expected-head-branch-prefix)
       run: |
         echo "Head branch: ${{ github.event.pull_request.head.ref }}"
-        echo "Expected head branch prefix: ${{ inputs.expected-head-branch }}"
+        echo "Expected head branch prefix: ${{ inputs.expected-head-branch-prefix }}"
       shell: bash
 
     - name: Set output to true
