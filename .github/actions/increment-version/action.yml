@@ -24,21 +24,45 @@ runs:
     - name: Get current version and build number
       id: get-current-version-info
       uses: ./.github/actions/get-current-version-info
-
     - name: Increment version
       id: increment-version
       if: inputs.increment-version == 'true'
       run: |
-        version=$(cat app.json | jq -r '.expo.version')
-        echo "version=$version" >> $GITHUB_OUTPUT
-      shell: bash
+        currentVersion=$(jq -r '.expo.version' app.json)
+        IFS='.' read -r -a versionParts <<< "$currentVersion"
+        
+        case "${{ inputs.increment-version-type }}" in
+          major)
+            versionParts[0]=$((versionParts[0] + 1))
+            versionParts[1]=0
+            versionParts[2]=0
+            ;;
+          minor)
+            versionParts[1]=$((versionParts[1] + 1))
+            versionParts[2]=0
+            ;;
+          patch)
+            versionParts[2]=$((versionParts[2] + 1))
+            ;;
+          *)
+            echo "Invalid version type. Use 'major', 'minor', or 'patch'."
+            exit 1
+            ;;
+        esac
 
+        newVersion=$(IFS=. ; echo "${versionParts[*]}")
+        jq --arg newVersion "$newVersion" '.expo.version = $newVersion' app.json > temp.json && mv temp.json app.json
+        echo "version=$newVersion" >> $GITHUB_OUTPUT
+      shell: bash
     - name: Increment build number
       id: increment-build-number
       if: inputs.increment-build-number == 'true'
       run: |
-        buildNumber=${{ steps.get-current-version-info.outputs.build-number }}
-        newBuildNumber=$((buildNumber + 1))
-        jq '.expo.ios.buildNumber = "${newBuildNumber}"' app.json > temp.json && mv temp.json app.json
+        currentBuildNumber=${{ steps.get-current-version-info.outputs.build-number }}
+        if [ -z "$currentBuildNumber" ]; then
+          currentBuildNumber=0
+        fi
+        newBuildNumber=$((currentBuildNumber + 1))
+        jq --arg newBuildNumber "$newBuildNumber" '.expo.ios.buildNumber = $newBuildNumber' app.json > temp.json && mv temp.json app.json
         echo "build-number=$newBuildNumber" >> $GITHUB_OUTPUT
       shell: bash
