@@ -71,6 +71,10 @@ runs:
       id: commit-and-push
       if: inputs.increment-version == 'true' || inputs.increment-build-number == 'true'
       run: |
+
+        git config --global user.name "github-actions"
+        git config --global user.email "actions@github.com"
+
         # Determine commit message based on which increments occurred
         commit_message="Incremented"
 
