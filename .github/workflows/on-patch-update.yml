@@ -6,26 +6,19 @@ on:
       - "patch-v*"
   
 jobs:
-  # release-ota:
-  #   name: Release Staging OTA
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-  #     - name: Submit OTA
-  #       uses: ./.github/actions/submit-ota
-  #       with:
-  #         # TODO: Add expo token to github secrets
-  #         expo-token: ${{ secrets.EXPO_TOKEN }}
-  #         release-channel: staging
-  #         release-message: "${{ github.event.pull_request.title }}"
-  log-expo-token:
-    name: Log Expo Token
+  release-ota:
+    name: Release Staging OTA
     runs-on: ubuntu-latest
     steps:
-      - name: Log Expo Token
-        run: echo "Expo Token- ${{ secrets.EXPO_TOKEN }}"
-        shell: bash
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Submit OTA
+        uses: ./.github/actions/submit-ota
+        with:
+          # TODO: Add expo token to github secrets
+          expo-token: ${{ secrets.EXPO_TOKEN }}
+          release-channel: staging
+          release-message: "${{ github.event.pull_request.title }}"
   open-main-pr:
     name: Open Main PR
     runs-on: ubuntu-latest
