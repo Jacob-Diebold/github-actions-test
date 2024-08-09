@@ -20,10 +20,6 @@ jobs:
         with:
           expected-base-branch-prefix: patch-v
           expected-head-branch-prefix: hotfix
-      - name: Log head and base branch names
-        run: |
-          echo "HEAD: ${{ github.event.pull_request.head.ref }}"
-          echo "BASE: ${{ github.event.pull_request.base.ref }}"
       - name: Submit OTA
         uses: ./.github/actions/submit-ota
         if: steps.check-merged-pr.outputs.result == 'true'
