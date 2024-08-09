@@ -2,10 +2,10 @@ name: Check Merged PR
 description: Checks if the PR is merged with the expected base and head branches
 
 inputs:
-  expected-base-branch:
+  expected-base-branch-prefix:
     description: The base branch for the pull request
     required: true
-  expected-head-branch:
+  expected-head-branch-prefix:
     description: The head branch for the pull request
     required: true
 
