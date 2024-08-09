@@ -1,0 +1,40 @@
+name: Check Merged PR
+description: Checks if the PR is merged with the expected base and head branches
+
+inputs:
+  expected-base-branch:
+    description: The base branch for the pull request
+    required: true
+  expected-head-branch:
+    description: The head branch for the pull request
+    required: true
+
+outputs:
+  result:
+    description: The result of the check (true or false)
+    value: ${{ steps.check-merged-pr.outputs.result }}
+
+runs:
+  using: composite
+  steps:
+    - name: Check if the PR is merged
+      id: check-merged-pr
+      run: |
+        if [ "${{ github.event.pull_request.merged }}" != "true" ]; then
+          echo "PR is not merged, skipping"
+          echo "result=false" >> $GITHUB_OUTPUT
+        else
+          if [ "${{ github.event.pull_request.base.ref }}" != "${{ inputs.expected-base-branch }}" ]; then
+            echo "Base branch does not match, skipping"
+            echo "result=false" >> $GITHUB_OUTPUT
+          else
+            if [ "${{ github.event.pull_request.head.ref }}" != "${{ inputs.expected-head-branch }}" ]; then
+              echo "Head branch does not match, skipping"
+              echo "result=false" >> $GITHUB_OUTPUT
+            else
+              echo "PR is merged with expected base and head branches, continuing"
+              echo "result=true" >> $GITHUB_OUTPUT
+            fi
+          fi
+        fi
+      shell: bash
