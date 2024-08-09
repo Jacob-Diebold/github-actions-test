@@ -1,0 +1,39 @@
+name: On Patch Update
+
+on:
+  push:
+    branches:
+      - "patch-v*"
+  
+jobs:
+  release-ota:
+    name: Release Staging OTA
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      # - name: Submit OTA
+      #   uses: ./.github/actions/submit-ota
+      #   with:
+      #     # TODO: Add expo token to github secrets
+      #     expo-token: ${{ secrets.EXPO_TOKEN }}
+      #     release-channel: staging
+      #     release-message: "${{ github.event.pull_request.title }}"
+  # open-main-pr:
+  #   name: Open Main PR
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+  #     - name: Open PR
+  #       uses: ./.github/actions/open-pr
+  #       with:
+  #         template: .github/templates/pr-patch-to-main.md
+  #         github-token: ${{ secrets.GITHUB_TOKEN }}
+  #         base-branch: main
+  #         branch-with-changes: ${{ github.ref_name }}
+
+  
+
+  
+    
