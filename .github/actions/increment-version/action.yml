@@ -100,7 +100,7 @@ runs:
         # Commit the changes
         git add app.json
         git commit -m "$commit_message"
-        echo "REPO-NAME: ${{ github.repository }}"
+        echo "REPO-NAME- ${{ github.repository }}"
         echo "Pushing changes to branch ${{ inputs.branch-to-push-changes-to }}"
 
         latest_sha=$(git rev-parse HEAD)
@@ -110,7 +110,7 @@ runs:
           -H "Authorization: token $GITHUB_TOKEN" \
           repos/${{ github.repository }}/git/refs/heads/${{ inputs.branch-to-push-changes-to }} \
           -F sha="$latest_sha" \
-          -X PATCH || \
+          -X PATCH
         
       env:
         GITHUB_TOKEN: ${{ inputs.github-admin-token }}
