@@ -12,27 +12,43 @@ inputs:
 outputs:
   result:
     description: The result of the check (true or false)
-    value: ${{ steps.check-merged-pr.outputs.result }}
+    value: ${{ steps.set-output.outputs.result }}
 
 runs:
   using: composite
   steps:
     - name: Check if the PR is merged
-      id: check-merged-pr
+      id: check-merged
       run: |
         if [ "${{ github.event.pull_request.merged }}" != "true" ]; then
           echo "PR is not merged, skipping"
-          echo "result=false" >> $GITHUB_OUTPUT
-        else
-          if [[ "${{ github.event.pull_request.base.ref }}" != "${{ inputs.expected-base-branch }}"* ]]; then
-            echo "Base branch does not match, skipping"
-            echo "result=false" >> $GITHUB_OUTPUT
-          elif [[ "${{ github.event.pull_request.head.ref }}" != "${{ inputs.expected-head-branch }}"* ]]; then
-            echo "Head branch does not match, skipping"
-            echo "result=false" >> $GITHUB_OUTPUT
-          else
-            echo "PR is merged with expected base and head branches, continuing"
-            echo "result=true" >> $GITHUB_OUTPUT
-          fi
+          exit 0
         fi
+      shell: bash
+
+    - name: Check if base branch starts with expected prefix
+      id: check-base
+      if: startsWith(github.event.pull_request.base.ref, inputs.expected-base-branch)
+      run: |
+        echo "Base branch: ${{ github.event.pull_request.base.ref }}"
+        echo "Expected base branch prefix: ${{ inputs.expected-base-branch }}"
+      shell: bash
+
+    - name: Check if head branch starts with expected prefix
+      id: check-head
+      if: startsWith(github.event.pull_request.head.ref, inputs.expected-head-branch)
+      run: |
+        echo "Head branch: ${{ github.event.pull_request.head.ref }}"
+        echo "Expected head branch prefix: ${{ inputs.expected-head-branch }}"
+      shell: bash
+
+    - name: Set output to true
+      id: set-output
+      if: steps.check-base.outcome == 'success' && steps.check-head.outcome == 'success'
+      run: echo "result=true" >> $GITHUB_OUTPUT
+      shell: bash
+
+    - name: Set output to false (if previous checks failed)
+      if: steps.set-output.outcome != 'success'
+      run: echo "result=false" >> $GITHUB_OUTPUT
       shell: bash
