@@ -19,11 +19,9 @@ runs:
   steps:
     - name: Check if the PR is merged
       id: check-merged
+      if: github.event.pull_request.merged == true
       run: |
-        if [ "${{ github.event.pull_request.merged }}" != "true" ]; then
-          echo "PR is not merged, skipping"
-          exit 0
-        fi
+        echo "PR was merged"
       shell: bash
 
     - name: Check if base branch starts with expected prefix
@@ -44,11 +42,11 @@ runs:
 
     - name: Set output to true
       id: set-output
-      if: steps.check-base.outcome == 'success' && steps.check-head.outcome == 'success'
+      if: steps.check-base.outcome == 'success' && steps.check-head.outcome == 'success' && steps.check-merged.outcome == 'success'
       run: echo "result=true" >> $GITHUB_OUTPUT
       shell: bash
 
-    - name: Set output to false (if previous checks failed)
-      if: steps.set-output.outcome != 'success'
-      run: echo "result=false" >> $GITHUB_OUTPUT
-      shell: bash
+    # - name: Set output to false (if previous checks failed)
+    #   if: steps.set-output.outcome != 'success'
+    #   run: echo "result=false" >> $GITHUB_OUTPUT
+    #   shell: bash
