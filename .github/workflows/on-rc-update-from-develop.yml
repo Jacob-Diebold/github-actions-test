@@ -1,0 +1,39 @@
+name: Trigger on PR merge on RC branch from Develop
+
+on:
+  pull_request:
+    branches:
+      - "rc-v*"
+    types:
+      - closed
+jobs:
+  submit-staging-build:
+    name: Submit Staging Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Check PR Info
+        id: check-merged-pr
+        uses: ./.github/actions/check-merged-pr
+        with:
+          expected-base-branch-prefix: rc-v
+          expected-head-branch-prefix: develop
+      - name: Submit Staging Build
+        uses: ./.github/actions/submit-build
+        if: steps.check-merged-pr.outputs.result == 'true'
+        with:
+          expo-token: ${{ secrets.EXPO_TOKEN }}
+          release-channel: staging
+      # TODO: Increment build number & create a pr to main
+      - name: Increment build number
+        uses: ./.github/actions/increment-version
+        with:
+          increment-build-number: true
+      - name: Get current version and build number
+        id: get-current-version-info
+        uses: ./.github/actions/get-current-version-info
+      - name: Log current version and build number
+        run: |
+          echo "Version: ${{ steps.get-current-version-info.outputs.version }}"
+          echo "Build number: ${{ steps.get-current-version-info.outputs.build-number }}"
