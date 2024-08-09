@@ -13,10 +13,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: Submit OTA if coming from patch branch
-        if: startsWith(github.ref, 'refs/heads/patch-v')
-        uses: ./.github/actions/submit-ota
-        with:
-          expo-token: ${{ secrets.EXPO_TOKEN }}
-          release-channel: production
-          release-message: ${{ github.event.pull_request.title }}
+      # - name: Submit OTA if coming from patch branch
+      #   if: startsWith(github.ref, 'refs/heads/patch-v')
+      #   uses: ./.github/actions/submit-ota
+      #   with:
+      #     expo-token: ${{ secrets.EXPO_TOKEN }}
+      #     release-channel: production
+      #     release-message: ${{ github.event.pull_request.title }}
