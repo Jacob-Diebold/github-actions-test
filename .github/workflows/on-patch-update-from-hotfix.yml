@@ -18,8 +18,8 @@ jobs:
         id: check-merged-pr
         uses: ./.github/actions/check-merged-pr
         with:
-          expected-base-branch: patch-v
-          expected-head-branch: hotfix
+          expected-base-branch-prefix: patch-v
+          expected-head-branch-prefix: hotfix
       - name: Log head and base branch names
         run: |
           echo "HEAD: ${{ github.event.pull_request.head.ref }}"
@@ -42,8 +42,8 @@ jobs:
         id: check-merged-pr
         uses: ./.github/actions/check-merged-pr
         with:
-          expected-base-branch: patch-v
-          expected-head-branch: hotfix
+          expected-base-branch-prefix: patch-v
+          expected-head-branch-prefix: hotfix
       - name: Open PR
         uses: ./.github/actions/open-pr
         if: steps.check-merged-pr.outputs.result == 'true'
