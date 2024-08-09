@@ -16,7 +16,8 @@ jobs:
         uses: actions/checkout@v4
       - name: Submit OTA
         uses: ./.github/actions/submit-ota
-if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'patch-v')        with:
+        if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'patch-v')
+        with:
           # TODO: Add expo token to github secrets
           expo-token: ${{ secrets.EXPO_TOKEN }}
           release-channel: staging
