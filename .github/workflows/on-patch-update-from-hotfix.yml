@@ -17,8 +17,8 @@ jobs:
       - name: Check PR Info
         uses: ./.github/actions/check-merged-pr
         with:
-          expected-base-branch: patch-v
-          expected-head-branch: hotfix
+          expected-base-branch: patch-v*
+          expected-head-branch: hotfix/*
       - name: Log head and base branch names
         run: |
           echo "HEAD: ${{ github.event.pull_request.head.ref }}"
