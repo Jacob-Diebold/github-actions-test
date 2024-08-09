@@ -1,1 +1,1 @@
-const number = 42;
+const number = 43;
