@@ -15,6 +15,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Check PR Info
+        id: check-merged-pr
         uses: ./.github/actions/check-merged-pr
         with:
           expected-base-branch: patch-v
@@ -38,6 +39,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Check PR Info
+        id: check-merged-pr
         uses: ./.github/actions/check-merged-pr
         with:
           expected-base-branch: patch-v
