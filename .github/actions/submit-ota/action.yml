@@ -28,11 +28,14 @@ runs:
       uses: actions/setup-node@v4
       with:
         node-version-file: ".nvmrc"
-    - name: Setup EAS
-      uses: expo/expo-github-action@v8
-      with:
-        eas-version: latest
-        token: ${{ inputs.expo-token }}
+
+    # TODO: Uncomment
+    # - name: Setup EAS
+    #   uses: expo/expo-github-action@v8
+    #   with:
+    #     eas-version: latest
+    #     token: ${{ inputs.expo-token }}
+    
     - name: Install dependencies
       run: npm i --no-audit --no-fund
       shell: bash
