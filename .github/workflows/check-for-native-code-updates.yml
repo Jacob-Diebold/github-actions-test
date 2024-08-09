@@ -1,0 +1,41 @@
+name: Check for Native Code Updates
+
+on:
+  pull_request:
+    branches:
+      - "patch-v*"
+
+jobs:
+  check-native-code:
+    name: Checking Changed Files
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Git
+      run: |
+        git fetch origin ${{ github.event.pull_request.base.ref }}
+
+    - name: Check for changes in package.json
+      run: |
+        BASE_BRANCH="${{ github.event.pull_request.base.ref }}"
+        CHANGED_FILES=$(git diff --name-only origin/$BASE_BRANCH)
+        
+        if echo "$CHANGED_FILES" | grep '^package\.json$'; then
+          echo "package.json has changed"
+          exit 1
+        else
+          echo "package.json has not changed"
+        fi
+    - name: Check for changes in app.json
+      run: |
+        BASE_BRANCH="${{ github.event.pull_request.base.ref }}"
+        CHANGED_FILES=$(git diff --name-only origin/$BASE_BRANCH)
+        
+        if echo "$CHANGED_FILES" | grep '^app\.json$'; then
+          echo "app.json has changed"
+          exit 1
+        else
+          echo "app.json has not changed"
+        fi

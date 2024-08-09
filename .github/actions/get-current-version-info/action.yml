@@ -1,0 +1,29 @@
+# Create a composite action that gets the current version and build number from the app.json file
+# and outputs them as variables
+
+name: Get Current Version and Build Info
+description: Gets the current version and build number from the app.json file
+
+outputs:
+  version:
+    description: The current version
+    value: ${{ steps.get-version.outputs.version }}
+  build-number:
+    description: The current build number
+    value: ${{ steps.get-build-number.outputs.build-number }}
+
+runs:
+  using: composite
+  steps:
+    - name: Get version
+      id: get-version
+      run: |
+        version=$(cat app.json | jq -r '.expo.version')
+        echo "version=$version" >> $GITHUB_OUTPUT
+      shell: bash
+    - name: Get build number
+      id: get-build-number
+      run: |
+        buildNumber=$(cat app.json | jq -r '.expo.ios.buildNumber')
+        echo "build-number=$buildNumber" >> $GITHUB_OUTPUT
+      shell: bash

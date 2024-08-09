@@ -1,0 +1,1 @@
+This is the template for the pull request body when the PR is created from the develop branch to a release candidate branch.

@@ -1,0 +1,52 @@
+name: Check Merged PR
+description: Checks if the PR is merged with the expected base and head branches
+
+inputs:
+  expected-base-branch-prefix:
+    description: The base branch for the pull request
+    required: true
+  expected-head-branch-prefix:
+    description: The head branch for the pull request
+    required: true
+
+outputs:
+  result:
+    description: The result of the check (true or false)
+    value: ${{ steps.set-output.outputs.result }}
+
+runs:
+  using: composite
+  steps:
+    - name: Check if the PR is merged
+      id: check-merged
+      if: github.event.pull_request.merged == true
+      run: |
+        echo "PR was merged"
+      shell: bash
+
+    - name: Check if base branch starts with expected prefix
+      id: check-base
+      if: startsWith(github.event.pull_request.base.ref, inputs.expected-base-branch-prefix)
+      run: |
+        echo "Base branch: ${{ github.event.pull_request.base.ref }}"
+        echo "Expected base branch prefix: ${{ inputs.expected-base-branch-prefix }}"
+      shell: bash
+
+    - name: Check if head branch starts with expected prefix
+      id: check-head
+      if: startsWith(github.event.pull_request.head.ref, inputs.expected-head-branch-prefix)
+      run: |
+        echo "Head branch: ${{ github.event.pull_request.head.ref }}"
+        echo "Expected head branch prefix: ${{ inputs.expected-head-branch-prefix }}"
+      shell: bash
+
+    - name: Set output to true
+      id: set-output
+      if: steps.check-base.outcome == 'success' && steps.check-head.outcome == 'success' && steps.check-merged.outcome == 'success'
+      run: echo "result=true" >> $GITHUB_OUTPUT
+      shell: bash
+
+    # - name: Set output to false (if previous checks failed)
+    #   if: steps.set-output.outcome != 'success'
+    #   run: echo "result=false" >> $GITHUB_OUTPUT
+    #   shell: bash

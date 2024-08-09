@@ -1,0 +1,46 @@
+name: Submit EAS Build
+description: Submits a build via EAS
+
+inputs:
+  expo-token:
+    description: The Expo token
+    required: true
+  release-channel:
+    description: The release channel to submit the build to
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Check for EXPO_TOKEN
+      run: |
+        if [ -z "${{ inputs.expo-token }}" ]; then
+            echo "You must provide an EXPO_TOKEN secret linked to this project's Expo account in this repo's secrets. Learn more: https://docs.expo.dev/eas-update/github-actions"
+            exit 1
+          fi
+      shell: bash
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version-file: ".nvmrc"
+
+    # TODO: Uncomment
+    # - name: Setup Expo & EAS
+    #   uses: expo/expo-github-action@v8
+    #   with:
+    #     eas-version: latest
+    #     token: ${{ inputs.expo-token }}
+    
+    - name: Install dependencies
+      run: npm i --no-audit --no-fund
+      shell: bash
+      
+    # TODO: REMOVE TEMP LOG MESSAGE
+    - name: Log the release message
+      run: echo "Submit Build -> channel-${{ inputs.release-channel }}"
+      shell: bash
+
+    # TODO: Uncomment
+    # - name: Submit Build
+    #   run: eas build -e ${{ inputs.release-channel }} -p ios --auto-submit --no-wait --non-interactive
+    #   shell: bash
