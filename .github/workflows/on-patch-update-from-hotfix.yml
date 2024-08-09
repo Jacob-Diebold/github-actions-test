@@ -14,13 +14,18 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      - name: Check PR Info
+        uses: ./.github/actions/check-merged-pr
+        with:
+          expected-base-branch: patch-v
+          expected-head-branch: hotfix
       - name: Log head and base branch names
         run: |
           echo "HEAD: ${{ github.event.pull_request.head.ref }}"
           echo "BASE: ${{ github.event.pull_request.base.ref }}"
       - name: Submit OTA
         uses: ./.github/actions/submit-ota
-        if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'patch-v')
+        if: steps.check-merged-pr.outputs.result == 'true'
         with:
           # TODO: Add expo token to github secrets
           expo-token: ${{ secrets.EXPO_TOKEN }}
@@ -32,9 +37,14 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      - name: Check PR Info
+        uses: ./.github/actions/check-merged-pr
+        with:
+          expected-base-branch: patch-v
+          expected-head-branch: hotfix
       - name: Open PR
         uses: ./.github/actions/open-pr
-        if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'patch-v')
+        if: steps.check-merged-pr.outputs.result == 'true'
         with:
           template: .github/templates/pr-patch-to-main.md
           github-token: ${{ secrets.GITHUB_TOKEN }}
