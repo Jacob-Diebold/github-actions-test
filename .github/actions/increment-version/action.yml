@@ -20,6 +20,9 @@ inputs:
   github-admin-token:
     description: The GitHub token with admin permissions
     required: true
+  branch-to-push-changes-to:
+    description: The branch to push the changes to
+    required: true
 
 runs:
   using: composite
@@ -102,7 +105,7 @@ runs:
         gh api \
           -H "Authorization: token $GITHUB_TOKEN" \
           repos/${{ github.repository }}/git/refs \
-          -F ref="refs/heads/$branch_name" \
+          -F ref="refs/heads/${{ inputs.branch-to-push-changes-to }}" \
           -F sha="$(git rev-parse HEAD)" \
           -X POST
         

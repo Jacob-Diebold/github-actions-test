@@ -33,6 +33,7 @@ jobs:
         with:
           increment-build-number: true
           github-admin-token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
+          branch-to-push-changes-to: ${{github.event.pull_request.base.ref}}
       - name: Get current version and build number
         id: get-current-version-info
         if: steps.check-merged-pr.outputs.result == 'true'
