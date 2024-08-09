@@ -24,11 +24,11 @@ runs:
           echo "PR is not merged, skipping"
           echo "result=false" >> $GITHUB_OUTPUT
         else
-          if [ "${{ github.event.pull_request.base.ref }}" != "${{ inputs.expected-base-branch }}" ]; then
+          if [ startsWith("${{ github.event.pull_request.base.ref }}", "${{ inputs.expected-base-branch }}")]; then
             echo "Base branch does not match, skipping"
             echo "result=false" >> $GITHUB_OUTPUT
           else
-            if [ "${{ github.event.pull_request.head.ref }}" != "${{ inputs.expected-head-branch }}" ]; then
+            if [ startsWith("${{ github.event.pull_request.head.ref }}", "${{ inputs.expected-head-branch }}")]; then
               echo "Head branch does not match, skipping"
               echo "result=false" >> $GITHUB_OUTPUT
             else
