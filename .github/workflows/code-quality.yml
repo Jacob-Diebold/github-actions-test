@@ -5,9 +5,10 @@ on:
     branches:
       - main
       - develop
+      - "patch-v*"
+      - "rc-v*"
     
 jobs:
-  # This workflow contains a single job called "build"
   lint:
     name: Lint
     runs-on: ubuntu-latest

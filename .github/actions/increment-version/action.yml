@@ -1,0 +1,44 @@
+# Create a composite action that increments the build number or version number in the app.json file depending on the input
+
+name: Increment Version
+description: Increments the build number or version number in the app.json file depending on the input
+
+inputs:
+  increment-version:
+    description: Whether to increment the version number (true or false)
+    required: false
+    default: "false"
+  increment-version-type:
+    description: The type of value to increment (major or minor or patch)
+    # If increment-version is true, this input is required
+    required: false
+    default: "minor"
+  increment-build-number:
+    description: Whether to increment the build number (true or false)
+    required: false
+    default: "false"
+
+runs:
+  using: composite
+  steps:
+    - name: Get current version and build number
+      id: get-current-version-info
+      uses: ./.github/actions/get-current-version-info
+
+    - name: Increment version
+      id: increment-version
+      if: inputs.increment-version == 'true'
+      run: |
+        version=$(cat app.json | jq -r '.expo.version')
+        echo "version=$version" >> $GITHUB_OUTPUT
+      shell: bash
+
+    - name: Increment build number
+      id: increment-build-number
+      if: inputs.increment-build-number == 'true'
+      run: |
+        buildNumber=${{ steps.get-current-version-info.outputs.build-number }}
+        newBuildNumber=$((buildNumber + 1))
+        jq '.expo.ios.buildNumber = "${newBuildNumber}"' app.json > temp.json && mv temp.json app.json
+        echo "build-number=$newBuildNumber" >> $GITHUB_OUTPUT
+      shell: bash
