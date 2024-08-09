@@ -107,10 +107,11 @@ runs:
 
         # Push the changes
         gh api \
+          -X PATCH \
           -H "Authorization: token $GITHUB_TOKEN" \
-          repos/${{ github.repository }}/git/refs/heads/${{ inputs.branch-to-push-changes-to }} \
-          -F sha="$latest_sha" \
-          -X PATCH
+          -H "Accept: application/vnd.github.v3+json" \
+          "/repos/${{ github.repository }}/git/refs/heads/${{ inputs.branch-to-push-changes-to }}" \
+          -F sha="$latest_sha"
         
       env:
         GITHUB_TOKEN: ${{ inputs.github-admin-token }}
