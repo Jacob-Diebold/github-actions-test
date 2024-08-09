@@ -27,13 +27,26 @@ jobs:
           release-channel: staging
       # TODO: Increment build number & create a pr to main
       - name: Increment build number
+        if: steps.check-merged-pr.outputs.result == 'true'
         uses: ./.github/actions/increment-version
         with:
           increment-build-number: true
       - name: Get current version and build number
         id: get-current-version-info
+        if: steps.check-merged-pr.outputs.result == 'true'
         uses: ./.github/actions/get-current-version-info
       - name: Log current version and build number
+        if: steps.check-merged-pr.outputs.result == 'true'
         run: |
           echo "Version: ${{ steps.get-current-version-info.outputs.version }}"
           echo "Build number: ${{ steps.get-current-version-info.outputs.build-number }}"
+          
+      - name: Open PR to main
+        id: open-pr-to-main
+        if: steps.check-merged-pr.outputs.result == 'true'
+        uses: ./.github/actions/open-pr
+        with:
+          template: .github/templates/pr-rc-to-main.md
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          base-branch: main
+          branch-with-changes: ${{github.event.pull_request.base.ref}}
