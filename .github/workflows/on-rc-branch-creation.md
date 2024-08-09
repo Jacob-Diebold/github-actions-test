@@ -1,3 +1,4 @@
+<!--  -->
 name: On Release Candidate Branch Creation
 
 on:

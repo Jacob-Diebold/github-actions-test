@@ -1,3 +1,4 @@
+<!-- TODO: Edit the trigger to only run on PRs from develop to rc branch -->
 name: On Release Candidate Update
 
 on:
