@@ -6,6 +6,7 @@ on:
       - "rc-v*"
     types:
       - closed
+  
 jobs:
   submit-staging-build:
     name: Submit Staging Build
@@ -31,6 +32,7 @@ jobs:
         uses: ./.github/actions/increment-version
         with:
           increment-build-number: true
+          github-admin-token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
       - name: Get current version and build number
         id: get-current-version-info
         if: steps.check-merged-pr.outputs.result == 'true'
