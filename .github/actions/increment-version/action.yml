@@ -17,6 +17,9 @@ inputs:
     description: Whether to increment the build number (true or false)
     required: false
     default: "false"
+  github-admin-token:
+    description: The GitHub token with admin permissions
+    required: true
 
 runs:
   using: composite
@@ -72,8 +75,8 @@ runs:
       if: inputs.increment-version == 'true' || inputs.increment-build-number == 'true'
       # TODO: Replace the user with a bot account that has admin access to the repo
       run: |
-        git config --global user.name "Jacob-Diebold"
-        git config --global user.email "diebold.jacob@gmail.com"
+        git config --global user.name "github-actions"
+        git config --global user.email "actions@github.com"
 
         # Determine commit message based on which increments occurred
         commit_message="Incremented"
@@ -95,4 +98,6 @@ runs:
         git add app.json
         git commit -m "$commit_message"
         git push
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-admin-token }}
       shell: bash
