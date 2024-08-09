@@ -73,12 +73,12 @@ runs:
     - name: Commit and push changes
       id: commit-and-push
       if: inputs.increment-version == 'true' || inputs.increment-build-number == 'true'
-      # TODO: Replace the user with a bot account that has admin access to the repo
-      run: |
-        git config --global user.name "Jacob Diebold"
-        git config --global user.email "diebold.jacob@gmail.com"
 
-        # Determine commit message based on which increments occurred
+      run: |
+
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
         commit_message="Incremented"
 
         if [ "${{ inputs.increment-version }}" == "true" ]; then
@@ -94,10 +94,46 @@ runs:
 
         commit_message+="."
 
-        # Commit and push changes
+        # Commit the changes
         git add app.json
         git commit -m "$commit_message"
-        git push
+
+        # Push the changes
+        gh api \
+          -H "Authorization: token $GITHUB_TOKEN" \
+          repos/${{ github.repository }}/git/refs \
+          -F ref="refs/heads/$branch_name" \
+          -F sha="$(git rev-parse HEAD)" \
+          -X POST
+        
       env:
         GITHUB_TOKEN: ${{ inputs.github-admin-token }}
+
+      # TODO: Replace the user with a bot account that has admin access to the repo
+      # run: |
+      #   git config --global user.name "Jacob Diebold"
+      #   git config --global user.email "diebold.jacob@gmail.com"
+
+      #   # Determine commit message based on which increments occurred
+      #   commit_message="Incremented"
+
+      #   if [ "${{ inputs.increment-version }}" == "true" ]; then
+      #     commit_message+=" version"
+      #   fi
+
+      #   if [ "${{ inputs.increment-build-number }}" == "true" ]; then
+      #     if [ "$commit_message" != "Incremented" ]; then
+      #       commit_message+=" and"
+      #     fi
+      #     commit_message+=" build number"
+      #   fi
+
+      #   commit_message+="."
+
+        # # Commit and push changes
+        # git add app.json
+        # git commit -m "$commit_message"
+        # git push
+      # env:
+      #   GITHUB_TOKEN: ${{ inputs.github-admin-token }}
       shell: bash
