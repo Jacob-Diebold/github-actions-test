@@ -127,7 +127,7 @@ runs:
       id: create-commit
       if: inputs.increment-version == 'true' || inputs.increment-build-number == 'true'
       run: |
-        COMMIT_PAYLOAD=$(printf '{"message":"Incremented build number.","tree":"%s","parents":["%s"]}' "${{ steps.create-tree.outputs.TREE_SHA_NEW }}" "$(git rev-parse HEAD)")
+        COMMIT_PAYLOAD=$(printf '{"message":"${{ steps.get-commit-message.outputs.commit-message }}","tree":"%s","parents":["%s"]}' "${{ steps.create-tree.outputs.TREE_SHA_NEW }}" "$(git rev-parse HEAD)")
         echo "Commit Payload: $COMMIT_PAYLOAD"
 
         RESPONSE=$(curl -s -X POST -H "Authorization: token ${{ inputs.github-admin-token }}" \
