@@ -3,4 +3,6 @@
 ## Summary
 
 ### Changes
-{{.existingChanges}}
+{{ range .existingChanges }}
+- {{ . }}
+{{ end }}
