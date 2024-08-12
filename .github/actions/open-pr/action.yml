@@ -44,11 +44,11 @@ runs:
         echo "EOF" >> $GITHUB_ENV
       shell: bash
 
-    - name: Set inputted existing changes
-      if: steps.check-pr-exists.outputs.result == 'false' && inputs.existing-changes != ''
-      run: |
-        echo "existing-changes=${{ inputs.existing-changes }}" >> $GITHUB_ENV
-      shell: bash
+    # - name: Set inputted existing changes
+    #   if: steps.check-pr-exists.outputs.result == 'false' && inputs.existing-changes != ''
+    #   run: |
+    #     echo "existing-changes=${{ inputs.existing-changes }}" >> $GITHUB_ENV
+    #   shell: bash
 
     - name: Log existing changes
       if: steps.check-pr-exists.outputs.result == 'false'
