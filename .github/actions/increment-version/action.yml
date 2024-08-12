@@ -109,11 +109,13 @@ runs:
       if: inputs.increment-version == 'true' || inputs.increment-build-number == 'true'
       run: |
         BASE_TREE=$(git rev-parse HEAD)
-        echo "Base Tree SHA: $BASE_TREE"
-        TREE_SHA_NEW=$(curl -s -X POST -H "Authorization: token ${{ inputs.github-admin-token }}" \
+        RESPONSE=$(curl -s -X POST -H "Authorization: token ${{ inputs.github-admin-token }}" \
           -d "{\"base_tree\":\"$BASE_TREE\",\"tree\":[{\"path\":\"app.json\",\"mode\":\"100644\",\"type\":\"blob\",\"content\":\"$(cat app.json)\"}]}" \
-          https://api.github.com/repos/${{ github.repository }}/git/trees | grep '"sha":' | cut -d '"' -f 4)
-        echo "New Tree SHA: $TREE_SHA_NEW"
+          https://api.github.com/repos/${{ github.repository }}/git/trees)
+          
+        echo "Curl Response: $RESPONSE"
+          
+        TREE_SHA_NEW=$(echo "$RESPONSE" | jq -r '.sha')
         echo "TREE_SHA_NEW=$TREE_SHA_NEW" >> $GITHUB_OUTPUT
       shell: bash
     - name: Log Tree SHA
