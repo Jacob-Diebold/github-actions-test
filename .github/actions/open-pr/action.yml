@@ -45,6 +45,8 @@ runs:
           echo "PR does not exist"
           echo "result=false" >> $GITHUB_OUTPUT
         fi
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
       shell: bash
 
     - name: Create Pull Request
