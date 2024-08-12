@@ -17,18 +17,18 @@ jobs:
         id: get-current-version-info
         uses: ./.github/actions/get-current-version-info
 
-      - name: Get existing changes
-        id: get-existing-changes
-        run: |
-          changes=$(gh pr view $(gh pr list --state merged -B develop --limit 1 --json number --jq '.[0].number') --json body --jq '.body' | awk '/### Changes/{flag=1; next} /## Testing/{flag=0} flag {print}' | tr '\n' '|')
-          echo "existing-changes=$changes" >> $GITHUB_OUTPUT
+      # - name: Get existing changes
+      #   id: get-existing-changes
+      #   run: |
+      #     changes=$(gh pr view $(gh pr list --state merged -B develop --limit 1 --json number --jq '.[0].number') --json body --jq '.body' | awk '/### Changes/{flag=1; next} /## Testing/{flag=0} flag {print}' | tr '\n' '|')
+      #     echo "existing-changes=$changes" >> $GITHUB_OUTPUT
 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Log existing changes
-        run: |
-          echo "Existing changes: ${{ steps.get-existing-changes.outputs.existing-changes }}"
+      # - name: Log existing changes
+      #   run: |
+      #     echo "Existing changes: ${{ steps.get-existing-changes.outputs.existing-changes }}"
 
       - name: Open PR
         uses: ./.github/actions/open-pr

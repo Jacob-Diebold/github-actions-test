@@ -4,9 +4,6 @@ inputs:
   template:
     description: The path to the template file
     required: true
-  existing-changes:
-    description: The body of existing changes
-    required: false
   github-token:
     description: The GitHub token
     required: true
@@ -35,28 +32,6 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github-token }}
       shell: bash
 
-    - name: Set default existing changes
-      if: steps.check-pr-exists.outputs.result == 'false' && inputs.existing-changes == ''
-      run: |
-        echo "existing-changes<<EOF" >> $GITHUB_ENV
-        echo "TEST1:" >> $GITHUB_ENV
-        echo "<!-- List out the changes -->" >> $GITHUB_ENV
-        echo "TEST2:" >> $GITHUB_ENV 
-        echo "<!-- - tls-111(fix): Fixed xyz -->" >> $GITHUB_ENV
-        echo "EOF" >> $GITHUB_ENV
-      shell: bash
-
-    # - name: Set inputted existing changes
-    #   if: steps.check-pr-exists.outputs.result == 'false' && inputs.existing-changes != ''
-    #   run: |
-    #     echo "existing-changes=${{ inputs.existing-changes }}" >> $GITHUB_ENV
-    #   shell: bash
-
-    - name: Log existing changes
-      if: steps.check-pr-exists.outputs.result == 'false'
-      run: |
-        echo "Existing changes: ${{ env.existing-changes }}"
-      shell: bash
 
     - name: Write PR body
       if: steps.check-pr-exists.outputs.result == 'false'
@@ -66,7 +41,6 @@ runs:
         template: ${{ inputs.template }}
         vars: |
           baseBranchName: ${{ inputs.base-branch }}
-          existingChanges: ${{ env.existing-changes }}
 
     - name: Read PR body from file
       if: steps.check-pr-exists.outputs.result == 'false'
