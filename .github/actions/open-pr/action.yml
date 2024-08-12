@@ -38,7 +38,7 @@ runs:
     - name: Set default existing changes
       if: steps.check-pr-exists.outputs.result == 'false' && inputs.existing-changes == ''
       run: |
-        echo "existing-changes=#<!-- List out the changes -->##<!-- - tls-111(fix): Fixed xyz -->\#" >> $GITHUB_ENV
+        echo "existing-changes=<!-- List out the changes --><!-- - tls-111(fix): Fixed xyz -->" >> $GITHUB_ENV
 
       shell: bash
 
