@@ -1,6 +1,6 @@
 <!-- Use this PR template for any manual PRs requesting to pull changes from a feature/hotfix branch into the develop/patch branch -->
 
-# __HEAD BRANCH__ -> __BASE BRANCH__
+# __HEAD_BRANCH__ -> __BASE_BRANCH__
 
 ## Summary
 
