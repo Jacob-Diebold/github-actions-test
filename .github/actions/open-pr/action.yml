@@ -20,7 +20,7 @@ runs:
     - name: Check if PR already exists
       id: check-pr-exists
       run: |
-        gh pr list --search '${{inputs.branch-with-changes}} -> ${{inputs.base-branch}}' --json number --jq '.[] | select(.number != null)' > pr-number.json
+        gh pr list --search -H ${{inputs.branch-with-changes}} -B ${{inputs.base-branch}} --json number --jq '.[] | select(.number != null)' > pr-number.json
         if [ -s pr-number.json ]; then
           echo "PR already exists"
           echo "result=true" >> $GITHUB_OUTPUT
@@ -39,7 +39,7 @@ runs:
         template: ${{ inputs.template }}
         vars: |
           baseBranchName: ${{ inputs.base-branch }}
-          
+
     - name: Read PR body from file
       if: steps.check-pr-exists.outputs.result == 'false'
       id: read_pr_body
