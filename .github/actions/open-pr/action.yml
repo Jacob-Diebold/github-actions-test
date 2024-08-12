@@ -4,6 +4,14 @@ inputs:
   template:
     description: The path to the template file
     required: true
+  existing-changes:
+    description: The body of existing changes
+    required: false
+    default: |
+      <!-- List out the changes -->
+
+      <!-- - tls-111(fix): Fixed xyz -->
+
   github-token:
     description: The GitHub token
     required: true
@@ -39,6 +47,7 @@ runs:
         template: ${{ inputs.template }}
         vars: |
           baseBranchName: ${{ inputs.base-branch }}
+          existingChanges: ${{ inputs.existing-changes }}
 
     - name: Read PR body from file
       if: steps.check-pr-exists.outputs.result == 'false'

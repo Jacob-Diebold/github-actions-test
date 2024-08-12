@@ -17,6 +17,14 @@ jobs:
         id: get-current-version-info
         uses: ./.github/actions/get-current-version-info
 
+      - name: Get existing changes
+        id: get-existing-changes
+        run: |
+          gh pr view $(gh pr list --state merged -B develop --limit 1 --json number --jq '.[0].number') --json body --jq '.body' | awk '/### Changes/{flag=1; next} /## Testing/{flag=0} flag'
+          echo "existing-changes=$flag" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Open PR
         uses: ./.github/actions/open-pr
         with:
@@ -24,3 +32,4 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           base-branch: rc-v${{ steps.get-current-version-info.outputs.version }}
           branch-with-changes: develop
+          existing-changes: ${{ steps.get-existing-changes.outputs.existing-changes }}
