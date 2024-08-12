@@ -17,23 +17,6 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Write PR body
-      id: write-pr-body
-      uses: ./.github/actions/open-pr/write-pr-body
-      with:
-        template: ${{ inputs.template }}
-        vars: |
-          baseBranchName: ${{ inputs.base-branch }}
-    - name: Read PR body from file
-      id: read_pr_body
-      run: |
-        PR_BODY=$(cat ${{ steps.write-pr-body.outputs.pr-body-file-env-name }})
-        echo "PR_BODY<<EOF" >> $GITHUB_ENV
-        echo "$PR_BODY" >> $GITHUB_ENV
-        echo "EOF" >> $GITHUB_ENV
-      shell: bash
-
-    # TODO: Check if a PR already exists for this branch
     - name: Check if PR already exists
       id: check-pr-exists
       run: |
@@ -47,6 +30,24 @@ runs:
         fi
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
+      shell: bash
+    - name: Write PR body
+      if: steps.check-pr-exists.outputs.result == 'false'
+      id: write-pr-body
+      uses: ./.github/actions/open-pr/write-pr-body
+      with:
+        template: ${{ inputs.template }}
+        vars: |
+          baseBranchName: ${{ inputs.base-branch }}
+          
+    - name: Read PR body from file
+      if: steps.check-pr-exists.outputs.result == 'false'
+      id: read_pr_body
+      run: |
+        PR_BODY=$(cat ${{ steps.write-pr-body.outputs.pr-body-file-env-name }})
+        echo "PR_BODY<<EOF" >> $GITHUB_ENV
+        echo "$PR_BODY" >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
       shell: bash
 
     - name: Create Pull Request
