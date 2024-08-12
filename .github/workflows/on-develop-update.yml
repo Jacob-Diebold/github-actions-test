@@ -1,4 +1,3 @@
-# <!-- TODO: Add workflow to open PR from develop to rc branch using the current version in develop for the targeted branch -->
 name: On Develop Update
 
 on:
@@ -17,11 +16,6 @@ jobs:
       - name: Get current version and build number
         id: get-current-version-info
         uses: ./.github/actions/get-current-version-info
-
-      - name: Log current version and build number
-        run: |
-          echo "Version: ${{ steps.get-current-version-info.outputs.version }}"
-          echo "Build number: ${{ steps.get-current-version-info.outputs.build-number }}"
 
       - name: Open PR
         uses: ./.github/actions/open-pr

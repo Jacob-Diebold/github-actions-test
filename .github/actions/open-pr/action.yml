@@ -34,12 +34,22 @@ runs:
       shell: bash
 
     # TODO: Check if a PR already exists for this branch
+    - name: Check if PR already exists
+      id: check-pr-exists
+      run: |
+        gh pr list --search '${{inputs.branch-with-changes}} -> ${{inputs.base-branch}}' --json number --jq '.[] | select(.number != null)' > pr-number.json
+        if [ -s pr-number.json ]; then
+          echo "PR already exists"
+          echo "result=true" >> $GITHUB_OUTPUT
+        else
+          echo "PR does not exist"
+          echo "result=false" >> $GITHUB_OUTPUT
+        fi
+      shell: bash
 
-    # TODO: If it does, edit the body to include the new changes as well
-
-    # If not, create a PR
     - name: Create Pull Request
-      run: gh pr create -B ${{inputs.base-branch}} -H ${{inputs.branch-with-changes}} --title 'Merge ${{inputs.branch-with-changes}} into ${{inputs.base-branch}}' --body '${{env.PR_BODY}}'
+      if: steps.check-pr-exists.outputs.result == 'false'
+      run: gh pr create -B ${{inputs.base-branch}} -H ${{inputs.branch-with-changes}} --title '${{inputs.branch-with-changes}} -> ${{inputs.base-branch}}' --body '${{env.PR_BODY}}'
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
       shell: bash
