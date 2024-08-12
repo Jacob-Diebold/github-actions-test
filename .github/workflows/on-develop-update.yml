@@ -26,7 +26,7 @@ jobs:
       - name: Open PR
         uses: ./.github/actions/open-pr
         with:
-          template: .github/templates/pr-develop-to-rc.md
+          template: .github/templates/DEV_RC_PR.md
           github-token: ${{ secrets.GITHUB_TOKEN }}
           base-branch: rc-v${{ steps.get-current-version-info.outputs.version }}
           branch-with-changes: develop

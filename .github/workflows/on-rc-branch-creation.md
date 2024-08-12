@@ -26,7 +26,7 @@ jobs:
       #   if: steps.check-branch-creation.outputs.result == 'true'
       #   uses: ./.github/actions/open-pr
       #   with:
-      #     template: .github/templates/pr-develop-to-rc.md
+      #     template: .github/templates/DEV_RC_PR.md
       #     github-token: ${{ secrets.GITHUB_TOKEN }}
       #     base-branch: ${{ github.ref_name }}
       #     branch-with-changes: develop

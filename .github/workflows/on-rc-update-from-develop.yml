@@ -49,7 +49,7 @@ jobs:
         if: steps.check-merged-pr.outputs.result == 'true'
         uses: ./.github/actions/open-pr
         with:
-          template: .github/templates/pr-rc-to-main.md
+          template: .github/templates/RC_MAIN_PR.md
           github-token: ${{ secrets.GITHUB_TOKEN }}
           base-branch: main
           branch-with-changes: ${{github.event.pull_request.base.ref}}
