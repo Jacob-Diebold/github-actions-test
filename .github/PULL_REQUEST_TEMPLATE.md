@@ -1,4 +1,4 @@
-<!-- Use this PR template for any manual PRs requesting to pull changes from a feature/hotfix branch into the develop branch -->
+<!-- Use this PR template for any manual PRs requesting to pull changes from a feature/hotfix branch into the develop/patch branch -->
 
 # HEAD_BRANCH -> BASE_BRANCH
 
