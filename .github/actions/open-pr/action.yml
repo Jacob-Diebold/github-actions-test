@@ -43,14 +43,16 @@ runs:
     - name: Set inputted existing changes
       if: steps.check-pr-exists.outputs.result == 'false' && inputs.existing-changes != ''
       run: |
-        echo "existing-changes=${{ inputs.existing-changes }}" >> $GITHUB_ENV
+        # replace all pipes with newlines
+        existing_changes=$(echo "${{ inputs.existing-changes }}" | tr '|' '\n')
+        echo "existing-changes=$existing_changes" >> $GITHUB_ENV
       shell: bash
 
 
     - name: Log existing changes
       if: steps.check-pr-exists.outputs.result == 'false'
       run: |
-        echo "Existing changes: ${{ steps.set-existing-changes.outputs.existing-changes }}, ${{ inputs.existing-changes }}, ${{ env.existing-changes }}"
+        echo "Existing changes: ${{ env.existing-changes }}"
       shell: bash
 
     - name: Write PR body
