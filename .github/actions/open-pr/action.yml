@@ -7,11 +7,11 @@ inputs:
   existing-changes:
     description: The body of existing changes
     required: false
-    default: |
-      <!-- List out the changes -->
+    # default: |
+    
+    #   <!-- List out the changes -->
 
-      <!-- - tls-111(fix): Fixed xyz -->
-
+    #   <!-- - tls-111(fix): Fixed xyz -->
   github-token:
     description: The GitHub token
     required: true
@@ -39,11 +39,20 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
       shell: bash
+
+    - name: Set existing changes
+      # If the existing changes input is empty, set it to the default value
+      if: steps.check-pr-exists.outputs.result == 'false' && inputs.existing-changes == ''
+      run: |
+        echo "existing-changes=\n<!-- List out the changes -->\n\n<!-- - tls-111(fix): Fixed xyz -->\n" >> $GITHUB_OUTPUT
+      shell: bash
+
     - name: Log existing changes
       if: steps.check-pr-exists.outputs.result == 'false'
       run: |
-        echo "Existing changes: ${{ inputs.existing-changes }}"
+        echo "Existing changes: ${{ steps.set-existing-changes.outputs.existing-changes }}"
       shell: bash
+
     - name: Write PR body
       if: steps.check-pr-exists.outputs.result == 'false'
       id: write-pr-body
@@ -52,7 +61,7 @@ runs:
         template: ${{ inputs.template }}
         vars: |
           baseBranchName: ${{ inputs.base-branch }}
-          existingChanges: ${{ inputs.existing-changes }}
+          existingChanges: ${{ steps.set-existing-changes.outputs.existing-changes }}
 
     - name: Read PR body from file
       if: steps.check-pr-exists.outputs.result == 'false'
