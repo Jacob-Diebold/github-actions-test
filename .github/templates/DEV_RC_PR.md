@@ -3,7 +3,4 @@
 ## Summary
 
 ### Changes
-{{- $changes := split .existingChanges "|" -}}
-{{- range $index, $change := $changes -}}
-- {{ $change }}
-{{- end -}}
+{{ .env.existing-changes }}
