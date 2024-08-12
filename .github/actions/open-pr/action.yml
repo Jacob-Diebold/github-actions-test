@@ -62,9 +62,9 @@ runs:
       uses: ./.github/actions/open-pr/write-pr-body
       with:
         template: ${{ inputs.template }}
-          # existingChanges: ${{ env.existing-changes }}
         vars: |
           baseBranchName: ${{ inputs.base-branch }}
+          existingChanges: ${{ env.existing-changes }}
 
     - name: Read PR body from file
       if: steps.check-pr-exists.outputs.result == 'false'

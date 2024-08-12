@@ -3,4 +3,4 @@
 ## Summary
 
 ### Changes
-{{ .env.existing-changes }}
+{{ .existingChanges }}
