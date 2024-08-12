@@ -97,23 +97,47 @@ runs:
 
         commit_message+="."
 
+        # Create a new tree
+
+        BASE_TREE=$(git rev-parse HEAD)
+        TREE_SHA_NEW=$(curl -s -X POST -H "Authorization: token ${{ inputs.github-admin-token }}" \
+          -d "{\"base_tree\":\"$BASE_TREE\",\"tree\":[{\"path\":\"app.json\",\"mode\":\"100644\",\"type\":\"blob\",\"content\":\"$(cat app.json)\"}]}" \
+          https://api.github.com/repos/${{ github.repository }}/git/trees | grep '"sha":' | cut -d '"' -f 4)
+        echo "::set-output name=tree_sha::$TREE_SHA_NEW"
+
+
+        # Create a new commit
+        COMMIT_SHA=$(curl -s -X POST -H "Authorization: token ${{ inputs.github-admin-token }}" \
+          -d "{\"message\":\"$commit_message\",\"tree\":\"$TREE_SHA_NEW\",\"parents\":[\"$(git rev-parse HEAD)\"]}" \
+          https://api.github.com/repos/${{ github.repository }}/git/commits | grep '"sha":' | cut -d '"' -f 4)
+        echo "::set-output name=commit_sha::$COMMIT_SHA"
+
+        # Update branch reference
+        curl -X PATCH -H "Authorization: token ${{ inputs.github-admin-token }}" \
+        -d "{\"sha\": \"$COMMIT_SHA\", \"force\": true}" \
+        https://api.github.com/repos/${{ github.repository }}/git/refs/heads/${{ inputs.branch-to-push-changes-to }}
+
+
         # Commit the changes
-        git add app.json
-        git commit -m "$commit_message"
-        echo "REPO-NAME- ${{ github.repository }}"
-        echo "Pushing changes to branch ${{ inputs.branch-to-push-changes-to }}"
 
-        latest_sha=$(git rev-parse HEAD)
+        # git add app.json
+        # git commit -m "$commit_message"
+        # echo "REPO-NAME- ${{ github.repository }}"
+        # echo "Pushing changes to branch ${{ inputs.branch-to-push-changes-to }}"
+        # git push
 
-        # Push the changes
-        gh api \
-          -H "Authorization: token $GITHUB_TOKEN" \
-          repos/${{ github.repository }}/git/refs/heads/${{ inputs.branch-to-push-changes-to }} \
-          -F sha="$latest_sha" \
-          -X PATCH
+        # latest_sha=$(git rev-parse HEAD)
+
+        # # Push the changes
+        # gh api \
+        #   -X PATCH \
+        #   -H "Authorization: token $GITHUB_TOKEN" \
+        #   -H "Accept: application/vnd.github.v3+json" \
+        #   "/repos/${{ github.repository }}/git/refs/heads/${{ inputs.branch-to-push-changes-to }}" \
+        #   -F sha="$latest_sha"
         
-      env:
-        GITHUB_TOKEN: ${{ inputs.github-admin-token }}
+      # env:
+      #   GITHUB_TOKEN: ${{ inputs.github-admin-token }}
 
       # TODO: Replace the user with a bot account that has admin access to the repo
       # run: |
