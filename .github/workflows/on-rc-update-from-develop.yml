@@ -32,8 +32,6 @@ jobs:
         uses: ./.github/actions/increment-version
         with:
           increment-build-number: true
-          increment-version: true
-          increment-version-type: minor
           github-admin-token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
           branch-to-push-changes-to: ${{github.event.pull_request.base.ref}}
       - name: Get current version and build number
