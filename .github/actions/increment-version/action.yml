@@ -72,11 +72,9 @@ runs:
         jq --arg newBuildNumber "$newBuildNumber" '.expo.ios.buildNumber = $newBuildNumber' app.json > temp.json && mv temp.json app.json
         echo "build-number=$newBuildNumber" >> $GITHUB_OUTPUT
       shell: bash
-
-    - name: Commit and push changes
-      id: commit-and-push
+    - name: Get Commit Message
+      id: get-commit-message
       if: inputs.increment-version == 'true' || inputs.increment-build-number == 'true'
-
       run: |
 
         git config --global user.name "github-actions[bot]"
@@ -97,23 +95,106 @@ runs:
 
         commit_message+="."
 
-        # Create a new tree
+        echo "commit-message=$commit_message" >> $GITHUB_OUTPUT
+      shell: bash
+    - name: Log Commit Message
+      id: log-commit-message
+      if: inputs.increment-version == 'true' || inputs.increment-build-number == 'true'
+      run: |
+        echo "Commit message: ${{ steps.get-commit-message.outputs.commit-message }}"
+      shell: bash
 
+    - name: Create a new tree
+      id: create-tree
+      if: inputs.increment-version == 'true' || inputs.increment-build-number == 'true'
+      run: |
         BASE_TREE=$(git rev-parse HEAD)
         TREE_SHA_NEW=$(curl -s -X POST -H "Authorization: token ${{ inputs.github-admin-token }}" \
           -d "{\"base_tree\":\"$BASE_TREE\",\"tree\":[{\"path\":\"app.json\",\"mode\":\"100644\",\"type\":\"blob\",\"content\":\"$(cat app.json)\"}]}" \
           https://api.github.com/repos/${{ github.repository }}/git/trees | grep '"sha":' | cut -d '"' -f 4)
+        echo "TREE_SHA_NEW=$TREE_SHA_NEW" >> $GITHUB_OUTPUT
+      shell: bash
+    - name: Log Tree SHA
+      id: log-tree-sha
+      if: inputs.increment-version == 'true' || inputs.increment-build-number == 'true'
+      run: |
+        echo "Tree SHA: ${{ steps.create-tree.outputs.TREE_SHA_NEW }}"
+      shell: bash
 
-
-        # Create a new commit
+    - name: Create a new commit
+      id: create-commit
+      if: inputs.increment-version == 'true' || inputs.increment-build-number == 'true'
+      run: |
         COMMIT_SHA=$(curl -s -X POST -H "Authorization: token ${{ inputs.github-admin-token }}" \
-          -d "{\"message\":\"$commit_message\",\"tree\":\"$TREE_SHA_NEW\",\"parents\":[\"$(git rev-parse HEAD)\"]}" \
+          -d "{\"message\":\"${{ steps.get-commit-message.outputs.commit-message }}\",\"tree\":\"${{ steps.create-tree.outputs.TREE_SHA_NEW }}\",\"parents\":[\"$(git rev-parse HEAD)\"]}" \
           https://api.github.com/repos/${{ github.repository }}/git/commits | grep '"sha":' | cut -d '"' -f 4)
+        echo "COMMIT_SHA=$COMMIT_SHA" >> $GITHUB_OUTPUT
+      shell: bash
 
-        # Update branch reference
+    - name: Log Commit SHA
+      id: log-commit-sha
+      if: inputs.increment-version == 'true' || inputs.increment-build-number == 'true'
+      run: |
+        echo "Commit SHA: ${{ steps.create-commit.outputs.COMMIT_SHA }}"
+      shell: bash
+    
+    - name: Update branch reference
+      id: update-branch-reference
+      if: inputs.increment-version == 'true' || inputs.increment-build-number == 'true'
+      run: |
         curl -X PATCH -H "Authorization: token ${{ inputs.github-admin-token }}" \
-        -d "{\"sha\": \"$COMMIT_SHA\", \"force\": true}" \
+        -d "{\"sha\": \"${{ steps.create-commit.outputs.COMMIT_SHA }}\", \"force\": true}" \
         https://api.github.com/repos/${{ github.repository }}/git/refs/heads/${{ inputs.branch-to-push-changes-to }}
+      shell: bash
+
+    - name: Log Branch Reference
+      id: log-branch-reference
+      if: inputs.increment-version == 'true' || inputs.increment-build-number == 'true'
+      run: |
+        echo "Branch reference: ${{ steps.update-branch-reference.outputs.branch-reference }}"
+      shell: bash
+
+    # - name: Commit and push changes
+    #   id: commit-and-push
+    #   if: inputs.increment-version == 'true' || inputs.increment-build-number == 'true'
+
+    #   run: |
+
+    #     git config --global user.name "github-actions[bot]"
+    #     git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+    #     commit_message="Incremented"
+
+    #     if [ "${{ inputs.increment-version }}" == "true" ]; then
+    #       commit_message+=" version"
+    #     fi
+
+    #     if [ "${{ inputs.increment-build-number }}" == "true" ]; then
+    #       if [ "$commit_message" != "Incremented" ]; then
+    #         commit_message+=" and"
+    #       fi
+    #       commit_message+=" build number"
+    #     fi
+
+    #     commit_message+="."
+
+    #     # Create a new tree
+
+    #     BASE_TREE=$(git rev-parse HEAD)
+    #     TREE_SHA_NEW=$(curl -s -X POST -H "Authorization: token ${{ inputs.github-admin-token }}" \
+    #       -d "{\"base_tree\":\"$BASE_TREE\",\"tree\":[{\"path\":\"app.json\",\"mode\":\"100644\",\"type\":\"blob\",\"content\":\"$(cat app.json)\"}]}" \
+    #       https://api.github.com/repos/${{ github.repository }}/git/trees | grep '"sha":' | cut -d '"' -f 4)
+
+
+    #     # Create a new commit
+    #     COMMIT_SHA=$(curl -s -X POST -H "Authorization: token ${{ inputs.github-admin-token }}" \
+    #       -d "{\"message\":\"$commit_message\",\"tree\":\"$TREE_SHA_NEW\",\"parents\":[\"$(git rev-parse HEAD)\"]}" \
+    #       https://api.github.com/repos/${{ github.repository }}/git/commits | grep '"sha":' | cut -d '"' -f 4)
+
+    #     # Update branch reference
+    #     curl -X PATCH -H "Authorization: token ${{ inputs.github-admin-token }}" \
+    #     -d "{\"sha\": \"$COMMIT_SHA\", \"force\": true}" \
+    #     https://api.github.com/repos/${{ github.repository }}/git/refs/heads/${{ inputs.branch-to-push-changes-to }}
 
 
         # Commit the changes
@@ -164,4 +245,4 @@ runs:
         # git push
       # env:
       #   GITHUB_TOKEN: ${{ inputs.github-admin-token }}
-      shell: bash
+      # shell: bash
