@@ -37,4 +37,4 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           base-branch: rc-v${{ steps.get-current-version-info.outputs.version }}
           branch-with-changes: develop
-          existing-changes: ${{ steps.get-existing-changes.outputs.existing-changes }}
+          # existing-changes: ${{ steps.get-existing-changes.outputs.existing-changes }}
