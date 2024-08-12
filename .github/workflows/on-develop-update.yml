@@ -25,6 +25,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Log existing changes
+        run: |
+          echo "Existing changes: ${{ steps.get-existing-changes.outputs.existing-changes }}"
+
       - name: Open PR
         uses: ./.github/actions/open-pr
         with:

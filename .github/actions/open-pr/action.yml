@@ -39,6 +39,11 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
       shell: bash
+    - name: Log existing changes
+      if: steps.check-pr-exists.outputs.result == 'false'
+      run: |
+        echo "Existing changes: ${{ inputs.existing-changes }}"
+      shell: bash
     - name: Write PR body
       if: steps.check-pr-exists.outputs.result == 'false'
       id: write-pr-body
