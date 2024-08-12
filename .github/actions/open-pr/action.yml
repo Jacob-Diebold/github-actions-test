@@ -40,7 +40,6 @@ runs:
       run: |
         echo "existing-changes<<EOF" >> $GITHUB_ENV
         echo "<!-- List out the changes -->" >> $GITHUB_ENV
-        echo "- tls-987(feat): Added xyz" >> $GITHUB_ENV
         echo "<!-- - tls-111(fix): Fixed xyz -->" >> $GITHUB_ENV
         echo "EOF" >> $GITHUB_ENV
       shell: bash
