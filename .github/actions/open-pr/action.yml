@@ -52,6 +52,33 @@ runs:
         echo "EOF" >> $GITHUB_ENV
       shell: bash
 
+    #  Check if the base branch exists
+    - name: Check if base branch exists
+      if: steps.check-pr-exists.outputs.result == 'false'
+      run: |
+        output=$(git ls-remote --heads origin ${{inputs.base-branch}})
+        if [ -z "$output" ]; then
+        echo "Base branch does not exist"
+        echo "result=false" >> $GITHUB_OUTPUT
+        else
+          echo "Base branch exists"
+          echo "result=true" >> $GITHUB_OUTPUT
+        fi
+      shell: bash
+
+    # If the base branch doesn't exist, create it
+    - name: Create base branch
+      if: steps.check-pr-exists.outputs.result == 'false' && steps.check-base-branch-exists.outputs.result == 'false'
+      run: |
+        git checkout -b ${{inputs.base-branch}} -h origin/main
+        git push -u origin ${{inputs.base-branch}}
+        git checkout ${{inputs.branch-with-changes}}
+
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+      shell: bash
+
+
     - name: Create Pull Request
       if: steps.check-pr-exists.outputs.result == 'false'
       run: gh pr create -B ${{inputs.base-branch}} -H ${{inputs.branch-with-changes}} --title '${{inputs.branch-with-changes}} -> ${{inputs.base-branch}}' --body '${{env.PR_BODY}}'
