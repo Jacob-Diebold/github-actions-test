@@ -22,6 +22,11 @@ jobs:
           expo-token: ${{ secrets.EXPO_TOKEN }}
           release-channel: staging
 
+      - name: Checkout head branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{github.event.pull_request.head.ref}}
+
       - name: Increment build number
         if: startsWith(github.head_ref, 'rc-v')
         uses: ./.github/actions/increment-version
