@@ -1,4 +1,4 @@
-name: On Prod Update from Release Candidate
+name: On Main Update from Release Candidate
 
 on:
   pull_request:

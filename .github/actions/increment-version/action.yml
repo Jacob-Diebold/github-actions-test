@@ -32,17 +32,9 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Log starting
-      run: echo "Starting Increment Version Action"
-      shell: bash
-      
     - name: Get current version and build number
       id: get-current-version-info
       uses: ./.github/actions/get-current-version-info
-
-    - name: Log pre - app.json content
-      run: cat app.json
-      shell: bash
 
     - name: Force set version
       if: inputs.force-set-version != ''
@@ -78,37 +70,6 @@ runs:
         echo "version=${{ steps.get-new-version.outputs.new-version }}" >> $GITHUB_OUTPUT
       shell: bash
     
-    # - name: Increment version
-    #   id: increment-version
-    #   if: inputs.increment-version == 'true'
-    #   run: |
-    #     currentVersion=$(jq -r '.expo.version' app.json)
-    #     IFS='.' read -r -a versionParts <<< "$currentVersion"
-        
-    #     case "${{ inputs.increment-version-type }}" in
-    #       major)
-    #         versionParts[0]=$((versionParts[0] + 1))
-    #         versionParts[1]=0
-    #         versionParts[2]=0
-    #         ;;
-    #       minor)
-    #         versionParts[1]=$((versionParts[1] + 1))
-    #         versionParts[2]=0
-    #         ;;
-    #       patch)
-    #         versionParts[2]=$((versionParts[2] + 1))
-    #         ;;
-    #       *)
-    #         echo "Invalid version type. Use 'major', 'minor', or 'patch'."
-    #         exit 1
-    #         ;;
-    #     esac
-
-    #     newVersion=$(IFS=. ; echo "${versionParts[*]}")
-    #     jq --arg newVersion "$newVersion" '.expo.version = $newVersion' app.json > temp.json && mv temp.json app.json
-    #     echo "version=$newVersion" >> $GITHUB_OUTPUT
-    #   shell: bash
-
     - name: Reset build number
       id: reset-build-number
       if: inputs.increment-version == 'true' && inputs.force-set-build-number == ''
@@ -157,20 +118,6 @@ runs:
         echo "commit-message=$commit_message" >> $GITHUB_OUTPUT
       shell: bash
 
-    - name: Log post -app.json content
-      run: cat app.json
-      shell: bash
-
-    - name: Log new version and build number
-      run: |
-        echo "New version- ${{ steps.get-new-version.outputs.new-version }}"
-        echo "New build number- ${{ steps.get-new-version.outputs.new-build-number }}"
-      shell: bash
-
-    - name: Log commit message
-      run: echo "Commit message- ${{ steps.get-commit-message.outputs.commit-message }}"
-      shell: bash
-
     - name: Create a new tree
       id: create-tree
       if: inputs.increment-version == 'true' || inputs.increment-build-number == 'true' || inputs.force-set-version != '' || inputs.force-set-build-number != ''
@@ -199,11 +146,6 @@ runs:
         echo "COMMIT_SHA=$COMMIT_SHA" >> $GITHUB_OUTPUT
       shell: bash
 
-    - name: Log commit sha
-      run: echo "Commit sha- ${{ steps.create-commit.outputs.COMMIT_SHA }}"
-      shell: bash
-
-    
     - name: Update branch reference
       id: update-branch-reference
       if: inputs.increment-version == 'true' || inputs.increment-build-number == 'true' || inputs.force-set-version != '' || inputs.force-set-build-number != ''
