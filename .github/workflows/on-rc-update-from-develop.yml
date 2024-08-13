@@ -20,6 +20,7 @@ jobs:
         with:
           expected-base-branch-prefix: rc-v
           expected-head-branch-prefix: develop
+          
       - name: Open PR to main
         id: open-pr-to-main
         if: steps.check-merged-pr.outputs.result == 'true'

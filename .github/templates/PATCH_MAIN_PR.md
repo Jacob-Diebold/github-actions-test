@@ -1,6 +1,6 @@
 <!-- Use this PR template for any PRs requesting to pull changes from a patch branch into the main branch -->
 
-# patch -> main
+# {{.headBranchName}} -> main
 
 ## Summary
 

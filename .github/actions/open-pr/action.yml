@@ -32,7 +32,6 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github-token }}
       shell: bash
 
-
     - name: Write PR body
       if: steps.check-pr-exists.outputs.result == 'false'
       id: write-pr-body
@@ -41,6 +40,7 @@ runs:
         template: ${{ inputs.template }}
         vars: |
           baseBranchName: ${{ inputs.base-branch }}
+          headBranchName: ${{ inputs.branch-with-changes }}
 
     - name: Read PR body from file
       if: steps.check-pr-exists.outputs.result == 'false'
@@ -52,7 +52,6 @@ runs:
         echo "EOF" >> $GITHUB_ENV
       shell: bash
 
-    #  Check if the base branch exists
     - name: Check if base branch exists
       if: steps.check-pr-exists.outputs.result == 'false'
       id: check-base-branch-exists
@@ -67,7 +66,6 @@ runs:
         fi
       shell: bash
 
-    # If the base branch doesn't exist, create it
     - name: Create base branch
       if: steps.check-pr-exists.outputs.result == 'false' && steps.check-base-branch-exists.outputs.result == 'false'
       uses: ./.github/actions/create-branch
@@ -75,19 +73,6 @@ runs:
         branch-name: ${{ inputs.base-branch }}
         base-branch: main
         github-token: ${{ inputs.github-token }}
-      # run: |
-      #   echo "Creating base branch ${{inputs.base-branch}}"
-      #   git fetch origin
-      #   git checkout main
-      #   git pull origin main
-      #   git checkout -b ${{inputs.base-branch}}
-      #   git push -u origin ${{inputs.base-branch}}
-      #   git checkout ${{inputs.branch-with-changes}}
-
-      # env:
-      #   GITHUB_TOKEN: ${{ inputs.github-token }}
-      # shell: bash
-
 
     - name: Create Pull Request
       if: steps.check-pr-exists.outputs.result == 'false'

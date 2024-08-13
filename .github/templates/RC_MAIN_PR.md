@@ -1,4 +1,4 @@
-# rc-vX.X.X -> main
+# {{.headBranchName}} -> main
 
 ## Summary
 

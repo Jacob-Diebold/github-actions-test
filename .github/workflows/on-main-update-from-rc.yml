@@ -29,7 +29,6 @@ jobs:
           expo-token: ${{ secrets.EXPO_TOKEN }}
           release-channel: production
 
-      # TODO: Incremement version in develop branch
       - name: Get current version and build number
         if: steps.check-merged-pr.outputs.result == 'true'
         id: get-current-version-info
@@ -61,7 +60,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # TODO: Create a new release candidate branch if it doesn't exist (from main) & incremement version
       - name: Create release candidate branch
         if: steps.check-merged-pr.outputs.result == 'true'
         uses: ./.github/actions/create-branch
