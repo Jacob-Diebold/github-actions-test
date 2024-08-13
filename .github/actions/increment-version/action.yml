@@ -148,7 +148,7 @@ runs:
 
     - name: Create a new tree
       id: create-tree
-      if: inputs.increment-version == 'true' || inputs.increment-build-number == 'true'
+      if: inputs.increment-version == 'true' || inputs.increment-build-number == 'true' || inputs.force-set-version != '' || inputs.force-set-build-number != ''
       run: |
         BASE_TREE=$(git rev-parse HEAD)
         CONTENT=$(cat app.json | jq -Rs .)
@@ -161,7 +161,7 @@ runs:
 
     - name: Create a new commit
       id: create-commit
-      if: inputs.increment-version == 'true' || inputs.increment-build-number == 'true'
+      if: inputs.increment-version == 'true' || inputs.increment-build-number == 'true' || inputs.force-set-version != '' || inputs.force-set-build-number != ''
       run: |
         COMMIT_PAYLOAD=$(printf '{"message":"${{ steps.get-commit-message.outputs.commit-message }}","tree":"%s","parents":["%s"]}' "${{ steps.create-tree.outputs.TREE_SHA_NEW }}" "$(git rev-parse HEAD)")
 
@@ -177,7 +177,7 @@ runs:
     
     - name: Update branch reference
       id: update-branch-reference
-      if: inputs.increment-version == 'true' || inputs.increment-build-number == 'true'
+      if: inputs.increment-version == 'true' || inputs.increment-build-number == 'true' || inputs.force-set-version != '' || inputs.force-set-build-number != ''
       run: |
         curl -X PATCH -H "Authorization: token ${{ inputs.github-admin-token }}" \
         -d "{\"sha\": \"${{ steps.create-commit.outputs.COMMIT_SHA }}\", \"force\": true}" \
