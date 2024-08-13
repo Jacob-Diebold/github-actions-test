@@ -14,13 +14,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      # Check if head branch is rc branch
-      - name: Log branch names
-        run: |
-          echo "Head branch is ${{ github.head_ref }}"
-          echo "Base branch is ${{ github.base_ref }}"
-          echo "Head check is ${{ startsWith(github.head_ref, 'refs/heads/rc-v') }}"
-          echo "Base check is ${{ startsWith(github.base_ref, 'refs/heads/rc-v') }}"
 
       - name: Submit Staging Build
         if: startsWith(github.head_ref, 'rc-v')
@@ -35,4 +28,4 @@ jobs:
         with:
           increment-build-number: true
           github-admin-token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
-          branch-to-push-changes-to: ${{github.event.pull_request.base.ref}}
+          branch-to-push-changes-to: ${{github.event.pull_request.head.ref}}
