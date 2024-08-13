@@ -32,6 +32,10 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Log starting
+      run: echo "Starting Increment Version Action"
+      shell: bash
+      
     - name: Get current version and build number
       id: get-current-version-info
       uses: ./.github/actions/get-current-version-info
