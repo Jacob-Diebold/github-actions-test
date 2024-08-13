@@ -55,6 +55,7 @@ runs:
     #  Check if the base branch exists
     - name: Check if base branch exists
       if: steps.check-pr-exists.outputs.result == 'false'
+      id: check-base-branch-exists
       run: |
         output=$(git ls-remote --heads origin ${{inputs.base-branch}})
         if [ -z "$output" ]; then
