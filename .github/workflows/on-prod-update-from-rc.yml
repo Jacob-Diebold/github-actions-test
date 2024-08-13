@@ -1,9 +1,11 @@
 name: On Prod Update from Release Candidate
 
 on:
-  push:
+  pull_request:
     branches:
       main
+    types:
+      - closed
 
 jobs:
   submit-prod-build:
@@ -12,9 +14,16 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Check PR Info
+        id: check-merged-pr
+        uses: ./.github/actions/check-merged-pr
+        with:
+          expected-base-branch-prefix: main
+          expected-head-branch-prefix: rc-v
       
       - name: Submit Prod Build if coming from release candidate branch
-        if: startsWith(github.head_ref, 'rc-v')
+        if: steps.check-merged-pr.outputs.result == 'true'
         uses: ./.github/actions/submit-build
         with:
           expo-token: ${{ secrets.EXPO_TOKEN }}
@@ -22,10 +31,12 @@ jobs:
 
       # TODO: Incremement version in develop branch
       - name: Get current version and build number
+        if: steps.check-merged-pr.outputs.result == 'true'
         id: get-current-version-info
         uses: ./.github/actions/get-current-version-info
       
       - name: Get incremented version
+        if: steps.check-merged-pr.outputs.result == 'true'
         id: get-incremented-version
         uses: ./.github/actions/increment-version/get-new-version
         with:
@@ -33,12 +44,13 @@ jobs:
           increment-version-type: minor
       
       - name: Checkout develop branch
+        if: steps.check-merged-pr.outputs.result == 'true'
         uses: actions/checkout@v4
         with:
           ref: develop
-          fetch-depth: 0
-      
+
       - name: Set new develop version
+        if: steps.check-merged-pr.outputs.result == 'true'
         uses: ./.github/actions/increment-version
         with:
           github-admin-token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
@@ -49,13 +61,15 @@ jobs:
 
       # TODO: Create a new release candidate branch if it doesn't exist (from main) & incremement version
       - name: Create release candidate branch
+        if: steps.check-merged-pr.outputs.result == 'true'
         uses: ./.github/actions/create-branch
         with:
           branch-name: rc-v${{ steps.get-incremented-version.outputs.new-version }}
-          base-branch: develop
+          base-branch: main
           github-token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
-          
+
       - name: Set new release candidate version
+        if: steps.check-merged-pr.outputs.result == 'true'
         uses: ./.github/actions/increment-version
         with:
           github-admin-token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
