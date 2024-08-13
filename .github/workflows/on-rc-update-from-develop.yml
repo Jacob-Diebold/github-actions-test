@@ -20,30 +20,6 @@ jobs:
         with:
           expected-base-branch-prefix: rc-v
           expected-head-branch-prefix: develop
-      - name: Submit Staging Build
-        uses: ./.github/actions/submit-build
-        if: steps.check-merged-pr.outputs.result == 'true'
-        with:
-          expo-token: ${{ secrets.EXPO_TOKEN }}
-          release-channel: staging
-      # TODO: Increment build number & create a pr to main
-      - name: Increment build number
-        if: steps.check-merged-pr.outputs.result == 'true'
-        uses: ./.github/actions/increment-version
-        with:
-          increment-build-number: true
-          github-admin-token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
-          branch-to-push-changes-to: ${{github.event.pull_request.base.ref}}
-      - name: Get current version and build number
-        id: get-current-version-info
-        if: steps.check-merged-pr.outputs.result == 'true'
-        uses: ./.github/actions/get-current-version-info
-      - name: Log current version and build number
-        if: steps.check-merged-pr.outputs.result == 'true'
-        run: |
-          echo "Version: ${{ steps.get-current-version-info.outputs.version }}"
-          echo "Build number: ${{ steps.get-current-version-info.outputs.build-number }}"
-          
       - name: Open PR to main
         id: open-pr-to-main
         if: steps.check-merged-pr.outputs.result == 'true'
