@@ -8,8 +8,8 @@ on:
       - closed
   
 jobs:
-  submit-staging-build:
-    name: Submit Staging Build
+  open-pr-to-main:
+    name: Open PR to main
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
