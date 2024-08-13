@@ -15,6 +15,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       # Check if head branch is rc branch
+      - name: Log branch names
+        run: |
+          echo "Head branch is ${{ github.head_ref }}"
+          echo "Base branch is ${{ github.base_ref }}"
+          echo "Head check is ${{ startsWith(github.head_ref, 'refs/heads/rc-v') }}"
+          echo "Base check is ${{ startsWith(github.base_ref, 'refs/heads/rc-v') }}"
 
       - name: Submit Staging Build
         if: startsWith(github.head_ref, 'refs/heads/rc-v')
