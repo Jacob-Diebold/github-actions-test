@@ -146,6 +146,17 @@ runs:
         echo "commit-message=$commit_message" >> $GITHUB_OUTPUT
       shell: bash
 
+
+    - name: Log new version and build number
+      run: |
+        echo "New version- ${{ steps.get-new-version.outputs.new-version }}"
+        echo "New build number- ${{ steps.get-new-version.outputs.new-build-number }}"
+      shell: bash
+
+    - name: Log commit message
+      run: echo "Commit message- ${{ steps.get-commit-message.outputs.commit-message }}"
+      shell: bash
+
     - name: Create a new tree
       id: create-tree
       if: inputs.increment-version == 'true' || inputs.increment-build-number == 'true' || inputs.force-set-version != '' || inputs.force-set-build-number != ''
@@ -172,6 +183,10 @@ runs:
         
         COMMIT_SHA=$(echo "$RESPONSE" | jq -r '.sha')
         echo "COMMIT_SHA=$COMMIT_SHA" >> $GITHUB_OUTPUT
+      shell: bash
+
+    - name: Log commit sha
+      run: echo "Commit sha- ${{ steps.create-commit.outputs.COMMIT_SHA }}"
       shell: bash
 
     
