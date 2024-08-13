@@ -36,10 +36,15 @@ runs:
       id: get-current-version-info
       uses: ./.github/actions/get-current-version-info
 
+    - name: Log pre - app.json content
+      run: cat app.json
+      shell: bash
+
     - name: Force set version
       if: inputs.force-set-version != ''
       id: force-set-version
       run: |
+        echo "Force setting version to ${{ inputs.force-set-version }}"
         jq --arg newVersion "${{ inputs.force-set-version }}" '.expo.version = $newVersion' app.json > temp.json && mv temp.json app.json
         echo "version=${{ inputs.force-set-version }}" >> $GITHUB_OUTPUT
       shell: bash
@@ -48,6 +53,7 @@ runs:
       if: inputs.force-set-build-number != ''
       id: force-set-build-number
       run: |
+        echo "Force setting build number to ${{ inputs.force-set-build-number }}"
         jq --arg newBuildNumber "${{ inputs.force-set-build-number }}" '.expo.ios.buildNumber = $newBuildNumber' app.json > temp.json && mv temp.json app.json
         echo "build-number=${{ inputs.force-set-build-number }}" >> $GITHUB_OUTPUT
       shell: bash
@@ -119,6 +125,7 @@ runs:
         jq --arg newBuildNumber "$newBuildNumber" '.expo.ios.buildNumber = $newBuildNumber' app.json > temp.json && mv temp.json app.json
         echo "build-number=$newBuildNumber" >> $GITHUB_OUTPUT
       shell: bash
+
     - name: Get Commit Message
       id: get-commit-message
       if: inputs.increment-version == 'true' || inputs.increment-build-number == 'true' || inputs.force-set-version != '' || inputs.force-set-build-number != ''
@@ -146,6 +153,9 @@ runs:
         echo "commit-message=$commit_message" >> $GITHUB_OUTPUT
       shell: bash
 
+    - name: Log post -app.json content
+      run: cat app.json
+      shell: bash
 
     - name: Log new version and build number
       run: |
