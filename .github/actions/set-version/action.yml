@@ -1,0 +1,95 @@
+name: Set Version
+description: Sets the version/ build number in the app.json file
+
+inputs:
+  version:
+    description: The version to set
+    required: false
+  build-number:
+    description: The build number to set
+    required: true
+  github-admin-token:
+    description: The GitHub token with admin permissions
+    required: true
+  branch-to-push-changes-to:
+    description: The branch to push the changes to
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Set version in app.json
+      id: set-version
+      if: inputs.version != ''
+      run: |
+        echo "Force setting version to ${{ inputs.version }}"
+        jq --arg newVersion "${{ inputs.version }}" '.expo.version = $newVersion' app.json > temp.json && mv temp.json app.json
+        echo "version=${{ inputs.version }}" >> $GITHUB_OUTPUT
+      shell: bash
+
+    - name: Set build number in app.json
+      id: set-build-number
+      run: |
+        echo "Force setting build number to ${{ inputs.build-number }}"
+        jq --arg newBuildNumber "${{ inputs.build-number }}" '.expo.ios.buildNumber = $newBuildNumber' app.json > temp.json && mv temp.json app.json
+        echo "build-number=${{ inputs.build-number }}" >> $GITHUB_OUTPUT
+      shell: bash
+
+    - name: Get Commit Message
+      id: get-commit-message
+      run: |
+
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+        commit_message="Incremented"
+
+        if [ "${{ inputs.version }}" != "" ] ; then
+          commit_message+=" version"
+        fi
+
+        if [ "${{ inputs.build-number }}" != "" ] ; then
+          if [ "$commit_message" != "Incremented" ]; then
+            commit_message+=" and"
+          fi
+          commit_message+=" build number"
+        fi
+
+
+        commit_message+="."
+
+        echo "commit-message=$commit_message" >> $GITHUB_OUTPUT
+      shell: bash
+
+    - name: Create a new tree
+      id: create-tree
+      run: |
+        BASE_TREE=$(git rev-parse HEAD)
+        CONTENT=$(cat app.json | jq -Rs .)
+        RESPONSE=$(curl -s -X POST -H "Authorization: token ${{ inputs.github-admin-token }}" \
+          -d "{\"base_tree\":\"$BASE_TREE\",\"tree\":[{\"path\":\"app.json\",\"mode\":\"100644\",\"type\":\"blob\",\"content\":$CONTENT}]}" \
+          https://api.github.com/repos/${{ github.repository }}/git/trees)          
+        TREE_SHA_NEW=$(echo "$RESPONSE" | jq -r '.sha')
+        echo "TREE_SHA_NEW=$TREE_SHA_NEW" >> $GITHUB_OUTPUT
+      shell: bash
+
+    - name: Create a new commit
+      id: create-commit
+      run: |
+        COMMIT_PAYLOAD=$(printf '{"message":"${{ steps.get-commit-message.outputs.commit-message }}","tree":"%s","parents":["%s"]}' "${{ steps.create-tree.outputs.TREE_SHA_NEW }}" "$(git rev-parse HEAD)")
+
+        RESPONSE=$(curl -s -X POST -H "Authorization: token ${{ inputs.github-admin-token }}" \
+          -d "$COMMIT_PAYLOAD" \
+          https://api.github.com/repos/${{ github.repository }}/git/commits)
+
+        
+        COMMIT_SHA=$(echo "$RESPONSE" | jq -r '.sha')
+        echo "COMMIT_SHA=$COMMIT_SHA" >> $GITHUB_OUTPUT
+      shell: bash
+
+    - name: Update branch reference
+      id: update-branch-reference
+      run: |
+        curl -X PATCH -H "Authorization: token ${{ inputs.github-admin-token }}" \
+        -d "{\"sha\": \"${{ steps.create-commit.outputs.COMMIT_SHA }}\", \"force\": true}" \
+        https://api.github.com/repos/${{ github.repository }}/git/refs/heads/${{ inputs.branch-to-push-changes-to }}
+      shell: bash

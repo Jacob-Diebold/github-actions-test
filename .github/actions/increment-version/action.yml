@@ -1,5 +1,3 @@
-# Create a composite action that increments the build number or version number in the app.json file depending on the input
-
 name: Increment Version
 description: Increments the build number or version number in the app.json file depending on the input
 
@@ -22,12 +20,6 @@ inputs:
   branch-to-push-changes-to:
     description: The branch to push the changes to
     required: true
-  force-set-version:
-    description: The version to force set
-    required: false
-  force-set-build-number:
-    description: The build number to force set
-    required: false
 
 runs:
   using: composite
@@ -36,26 +28,8 @@ runs:
       id: get-current-version-info
       uses: ./.github/actions/get-current-version-info
 
-    - name: Force set version
-      if: inputs.force-set-version != ''
-      id: force-set-version
-      run: |
-        echo "Force setting version to ${{ inputs.force-set-version }}"
-        jq --arg newVersion "${{ inputs.force-set-version }}" '.expo.version = $newVersion' app.json > temp.json && mv temp.json app.json
-        echo "version=${{ inputs.force-set-version }}" >> $GITHUB_OUTPUT
-      shell: bash
-    
-    - name: Force set build number
-      if: inputs.force-set-build-number != ''
-      id: force-set-build-number
-      run: |
-        echo "Force setting build number to ${{ inputs.force-set-build-number }}"
-        jq --arg newBuildNumber "${{ inputs.force-set-build-number }}" '.expo.ios.buildNumber = $newBuildNumber' app.json > temp.json && mv temp.json app.json
-        echo "build-number=${{ inputs.force-set-build-number }}" >> $GITHUB_OUTPUT
-      shell: bash
-
     - name: Get new version
-      if: inputs.increment-version == 'true' && inputs.force-set-version == ''
+      if: inputs.increment-version == 'true'
       id: get-new-version
       uses: ./.github/actions/increment-version/get-new-version
       with:
@@ -63,7 +37,7 @@ runs:
         increment-version-type: ${{ inputs.increment-version-type }}
 
     - name: Set new version
-      if: inputs.increment-version == 'true' && inputs.force-set-version == ''
+      if: inputs.increment-version == 'true'
       id: set-new-version
       run: |
         jq --arg newVersion "${{ steps.get-new-version.outputs.new-version }}" '.expo.version = $newVersion' app.json > temp.json && mv temp.json app.json
@@ -72,7 +46,7 @@ runs:
     
     - name: Reset build number
       id: reset-build-number
-      if: inputs.increment-version == 'true' && inputs.force-set-build-number == ''
+      if: inputs.increment-version == 'true'
       run: |
         jq --arg newBuildNumber "1" '.expo.ios.buildNumber = $newBuildNumber' app.json > temp.json && mv temp.json app.json
         echo "build-number=1" >> $GITHUB_OUTPUT
@@ -80,7 +54,7 @@ runs:
 
     - name: Increment build number
       id: increment-build-number
-      if: inputs.increment-build-number == 'true' && inputs.increment-version == 'false' && inputs.force-set-build-number == ''
+      if: inputs.increment-build-number == 'true' && inputs.increment-version == 'false'
       run: |
         currentBuildNumber=${{ steps.get-current-version-info.outputs.build-number }}
         if [ -z "$currentBuildNumber" ]; then
@@ -93,7 +67,7 @@ runs:
 
     - name: Get Commit Message
       id: get-commit-message
-      if: inputs.increment-version == 'true' || inputs.increment-build-number == 'true' || inputs.force-set-version != '' || inputs.force-set-build-number != ''
+      if: inputs.increment-version == 'true' || inputs.increment-build-number == 'true'
       run: |
 
         git config --global user.name "github-actions[bot]"
@@ -101,11 +75,11 @@ runs:
 
         commit_message="Incremented"
 
-        if [ "${{ inputs.increment-version }}" == "true" ] || [ "${{ inputs.force-set-version }}" != "" ]; then
+        if [ "${{ inputs.increment-version }}" == "true" ]; then
           commit_message+=" version"
         fi
 
-        if [ "${{ inputs.increment-build-number }}" == "true" ] || [ "${{ inputs.force-set-build-number }}" != "" ]; then
+        if [ "${{ inputs.increment-build-number }}" == "true" ]; then
           if [ "$commit_message" != "Incremented" ]; then
             commit_message+=" and"
           fi
@@ -120,7 +94,7 @@ runs:
 
     - name: Create a new tree
       id: create-tree
-      if: inputs.increment-version == 'true' || inputs.increment-build-number == 'true' || inputs.force-set-version != '' || inputs.force-set-build-number != ''
+      if: inputs.increment-version == 'true' || inputs.increment-build-number == 'true'
       run: |
         BASE_TREE=$(git rev-parse HEAD)
         CONTENT=$(cat app.json | jq -Rs .)
@@ -133,7 +107,7 @@ runs:
 
     - name: Create a new commit
       id: create-commit
-      if: inputs.increment-version == 'true' || inputs.increment-build-number == 'true' || inputs.force-set-version != '' || inputs.force-set-build-number != ''
+      if: inputs.increment-version == 'true' || inputs.increment-build-number == 'true'
       run: |
         COMMIT_PAYLOAD=$(printf '{"message":"${{ steps.get-commit-message.outputs.commit-message }}","tree":"%s","parents":["%s"]}' "${{ steps.create-tree.outputs.TREE_SHA_NEW }}" "$(git rev-parse HEAD)")
 
@@ -148,7 +122,7 @@ runs:
 
     - name: Update branch reference
       id: update-branch-reference
-      if: inputs.increment-version == 'true' || inputs.increment-build-number == 'true' || inputs.force-set-version != '' || inputs.force-set-build-number != ''
+      if: inputs.increment-version == 'true' || inputs.increment-build-number == 'true'
       run: |
         curl -X PATCH -H "Authorization: token ${{ inputs.github-admin-token }}" \
         -d "{\"sha\": \"${{ steps.create-commit.outputs.COMMIT_SHA }}\", \"force\": true}" \
