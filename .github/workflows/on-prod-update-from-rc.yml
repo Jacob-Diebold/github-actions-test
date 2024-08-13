@@ -58,6 +58,8 @@ jobs:
           force-set-version: ${{ steps.get-incremented-version.outputs.new-version }}
           force-set-build-number: 0
       
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       # TODO: Create a new release candidate branch if it doesn't exist (from main) & incremement version
       - name: Create release candidate branch
@@ -66,7 +68,7 @@ jobs:
         with:
           branch-name: rc-v${{ steps.get-incremented-version.outputs.new-version }}
           base-branch: main
-          github-token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set new release candidate version
         if: steps.check-merged-pr.outputs.result == 'true'
