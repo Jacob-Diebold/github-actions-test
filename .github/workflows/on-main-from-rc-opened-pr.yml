@@ -23,14 +23,14 @@ jobs:
           echo "Base check is ${{ startsWith(github.base_ref, 'refs/heads/rc-v') }}"
 
       - name: Submit Staging Build
-        if: startsWith(github.head_ref, 'refs/heads/rc-v')
+        if: startsWith(github.head_ref, 'rc-v')
         uses: ./.github/actions/submit-build
         with:
           expo-token: ${{ secrets.EXPO_TOKEN }}
           release-channel: staging
 
       - name: Increment build number
-        if: startsWith(github.head_ref, 'refs/heads/rc-v')
+        if: startsWith(github.head_ref, 'rc-v')
         uses: ./.github/actions/increment-version
         with:
           increment-build-number: true
