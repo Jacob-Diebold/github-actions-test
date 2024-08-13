@@ -26,6 +26,6 @@ jobs:
         uses: ./.github/actions/open-pr
         with:
           template: .github/templates/RC_MAIN_PR.md
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
           base-branch: main
           branch-with-changes: ${{github.event.pull_request.base.ref}}
