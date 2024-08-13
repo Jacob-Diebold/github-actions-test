@@ -1,0 +1,73 @@
+name: Create Branch
+description: Creates a new branch
+
+inputs:
+  branch-name:
+    description: The name of the branch to create
+    required: true
+  base-branch:
+    description: The base branch to create the branch from
+    required: true
+  github-token:
+    description: The GitHub token
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Check if branch already exists
+      id: check-branch-exists
+      run: |
+        output=$(git ls-remote --heads origin ${{inputs.branch-name}})
+        if [ -z "$output" ]; then
+          echo "Branch does not exist"
+          echo "result=false" >> $GITHUB_OUTPUT
+        else
+          echo "Branch exists"
+          echo "result=true" >> $GITHUB_OUTPUT
+        fi
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+      shell: bash
+
+    - name: Fetch origin
+      if: steps.check-branch-exists.outputs.result == 'false'
+      run: git fetch origin
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+      shell: bash
+
+    - name: Checkout base branch
+      if: steps.check-branch-exists.outputs.result == 'false'
+      run: git checkout ${{inputs.base-branch}}
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+      shell: bash
+
+    - name: Pull base branch
+      if: steps.check-branch-exists.outputs.result == 'false'
+      run: git pull origin ${{inputs.base-branch}}
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+      shell: bash
+
+    - name: Create branch
+      if: steps.check-branch-exists.outputs.result == 'false'
+      run: git checkout -b ${{inputs.branch-name}}
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+      shell: bash
+
+    - name: Push branch
+      if: steps.check-branch-exists.outputs.result == 'false'
+      run: git push -u origin ${{inputs.branch-name}}
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+      shell: bash
+    
+    - name: Checkout new branch
+      if: steps.check-branch-exists.outputs.result == 'false'
+      run: git checkout ${{inputs.branch-name}}
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+      shell: bash

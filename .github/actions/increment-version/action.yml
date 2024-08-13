@@ -10,7 +10,6 @@ inputs:
     default: "false"
   increment-version-type:
     description: The type of value to increment (major or minor or patch)
-    # If increment-version is true, this input is required
     required: false
     default: "minor"
   increment-build-number:
@@ -23,6 +22,12 @@ inputs:
   branch-to-push-changes-to:
     description: The branch to push the changes to
     required: true
+  force-set-version:
+    description: The version to force set
+    required: false
+  force-set-build-number:
+    description: The build number to force set
+    required: false
 
 runs:
   using: composite
@@ -30,39 +35,81 @@ runs:
     - name: Get current version and build number
       id: get-current-version-info
       uses: ./.github/actions/get-current-version-info
-    - name: Increment version
-      id: increment-version
-      if: inputs.increment-version == 'true'
-      run: |
-        currentVersion=$(jq -r '.expo.version' app.json)
-        IFS='.' read -r -a versionParts <<< "$currentVersion"
-        
-        case "${{ inputs.increment-version-type }}" in
-          major)
-            versionParts[0]=$((versionParts[0] + 1))
-            versionParts[1]=0
-            versionParts[2]=0
-            ;;
-          minor)
-            versionParts[1]=$((versionParts[1] + 1))
-            versionParts[2]=0
-            ;;
-          patch)
-            versionParts[2]=$((versionParts[2] + 1))
-            ;;
-          *)
-            echo "Invalid version type. Use 'major', 'minor', or 'patch'."
-            exit 1
-            ;;
-        esac
 
-        newVersion=$(IFS=. ; echo "${versionParts[*]}")
-        jq --arg newVersion "$newVersion" '.expo.version = $newVersion' app.json > temp.json && mv temp.json app.json
-        echo "version=$newVersion" >> $GITHUB_OUTPUT
+    - name: Force set version
+      if: inputs.force-set-version != ''
+      id: force-set-version
+      run: |
+        jq --arg newVersion "${{ inputs.force-set-version }}" '.expo.version = $newVersion' app.json > temp.json && mv temp.json app.json
+        echo "version=${{ inputs.force-set-version }}" >> $GITHUB_OUTPUT
       shell: bash
+    
+    - name: Force set build number
+      if: inputs.force-set-build-number != ''
+      id: force-set-build-number
+      run: |
+        jq --arg newBuildNumber "${{ inputs.force-set-build-number }}" '.expo.ios.buildNumber = $newBuildNumber' app.json > temp.json && mv temp.json app.json
+        echo "build-number=${{ inputs.force-set-build-number }}" >> $GITHUB_OUTPUT
+      shell: bash
+
+    - name: Get new version
+      if: inputs.increment-version == 'true' && inputs.force-set-version == ''
+      id: get-new-version
+      uses: ./.github/actions/increment-version/get-new-version
+      with:
+        current-version: ${{ steps.get-current-version-info.outputs.version }}
+        increment-version-type: ${{ inputs.increment-version-type }}
+
+    - name: Set new version
+      if: inputs.increment-version == 'true' && inputs.force-set-version == ''
+      id: set-new-version
+      run: |
+        jq --arg newVersion "${{ steps.get-new-version.outputs.new-version }}" '.expo.version = $newVersion' app.json > temp.json && mv temp.json app.json
+        echo "version=${{ steps.get-new-version.outputs.new-version }}" >> $GITHUB_OUTPUT
+      shell: bash
+    
+    # - name: Increment version
+    #   id: increment-version
+    #   if: inputs.increment-version == 'true'
+    #   run: |
+    #     currentVersion=$(jq -r '.expo.version' app.json)
+    #     IFS='.' read -r -a versionParts <<< "$currentVersion"
+        
+    #     case "${{ inputs.increment-version-type }}" in
+    #       major)
+    #         versionParts[0]=$((versionParts[0] + 1))
+    #         versionParts[1]=0
+    #         versionParts[2]=0
+    #         ;;
+    #       minor)
+    #         versionParts[1]=$((versionParts[1] + 1))
+    #         versionParts[2]=0
+    #         ;;
+    #       patch)
+    #         versionParts[2]=$((versionParts[2] + 1))
+    #         ;;
+    #       *)
+    #         echo "Invalid version type. Use 'major', 'minor', or 'patch'."
+    #         exit 1
+    #         ;;
+    #     esac
+
+    #     newVersion=$(IFS=. ; echo "${versionParts[*]}")
+    #     jq --arg newVersion "$newVersion" '.expo.version = $newVersion' app.json > temp.json && mv temp.json app.json
+    #     echo "version=$newVersion" >> $GITHUB_OUTPUT
+    #   shell: bash
+
+    - name: Reset build number
+      id: reset-build-number
+      if: inputs.increment-version == 'true' && inputs.force-set-build-number == ''
+      run: |
+        jq --arg newBuildNumber "1" '.expo.ios.buildNumber = $newBuildNumber' app.json > temp.json && mv temp.json app.json
+        echo "build-number=1" >> $GITHUB_OUTPUT
+      shell: bash
+
     - name: Increment build number
       id: increment-build-number
-      if: inputs.increment-build-number == 'true'
+      if: inputs.increment-build-number == 'true' && inputs.increment-version == 'false' && inputs.force-set-build-number == ''
       run: |
         currentBuildNumber=${{ steps.get-current-version-info.outputs.build-number }}
         if [ -z "$currentBuildNumber" ]; then
@@ -74,7 +121,7 @@ runs:
       shell: bash
     - name: Get Commit Message
       id: get-commit-message
-      if: inputs.increment-version == 'true' || inputs.increment-build-number == 'true'
+      if: inputs.increment-version == 'true' || inputs.increment-build-number == 'true' || inputs.force-set-version != '' || inputs.force-set-build-number != ''
       run: |
 
         git config --global user.name "github-actions[bot]"
@@ -82,16 +129,17 @@ runs:
 
         commit_message="Incremented"
 
-        if [ "${{ inputs.increment-version }}" == "true" ]; then
+        if [ "${{ inputs.increment-version }}" == "true" ] || [ "${{ inputs.force-set-version }}" != "" ]; then
           commit_message+=" version"
         fi
 
-        if [ "${{ inputs.increment-build-number }}" == "true" ]; then
+        if [ "${{ inputs.increment-build-number }}" == "true" ] || [ "${{ inputs.force-set-build-number }}" != "" ]; then
           if [ "$commit_message" != "Incremented" ]; then
             commit_message+=" and"
           fi
           commit_message+=" build number"
         fi
+
 
         commit_message+="."
 

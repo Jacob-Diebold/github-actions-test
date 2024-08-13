@@ -1,0 +1,47 @@
+name: Get New Version
+description: Gets the new version number based on the current version and the increment type
+
+inputs:
+  current-version:
+    description: The current version number
+    required: true
+  increment-version-type:
+    description: The type of value to increment (major or minor or patch)
+    required: false
+    default: "minor"
+
+outputs:
+  new-version:
+    description: The new version number
+    value: ${{ steps.get-new-version.outputs.new-version }}
+
+runs:
+  using: composite
+  steps:
+    - name: Get new version
+      id: get-new-version
+      run: |
+        IFS='.' read -r -a versionParts <<< "${{ inputs.current-version }}"
+        
+        case "${{ inputs.increment-version-type }}" in
+          major)
+            versionParts[0]=$((versionParts[0] + 1))
+            versionParts[1]=0
+            versionParts[2]=0
+            ;;
+          minor)
+            versionParts[1]=$((versionParts[1] + 1))
+            versionParts[2]=0
+            ;;
+          patch)
+            versionParts[2]=$((versionParts[2] + 1))
+            ;;
+          *)
+            echo "Invalid version type. Use 'major', 'minor', or 'patch'."
+            exit 1
+            ;;
+        esac
+
+        newVersion=$(IFS=. ; echo "${versionParts[*]}")
+        echo "new-version=$newVersion" >> $GITHUB_OUTPUT
+      shell: bash
