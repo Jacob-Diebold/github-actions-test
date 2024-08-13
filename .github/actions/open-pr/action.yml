@@ -70,6 +70,7 @@ runs:
     - name: Create base branch
       if: steps.check-pr-exists.outputs.result == 'false' && steps.check-base-branch-exists.outputs.result == 'false'
       run: |
+        echo "Creating base branch ${{inputs.base-branch}}"
         git checkout -b ${{inputs.base-branch}} -h origin/main
         git push -u origin ${{inputs.base-branch}}
         git checkout ${{inputs.branch-with-changes}}
