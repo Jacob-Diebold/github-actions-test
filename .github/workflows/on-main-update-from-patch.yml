@@ -1,0 +1,31 @@
+name: On Prod Update from Patch
+
+on:
+  pull_request:
+    branches:
+      main
+    types:
+      - closed
+
+jobs:
+  release-ota:
+    name: Release Prod OTA if needed
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check PR Info
+        id: check-merged-pr
+        uses: ./.github/actions/check-merged-pr
+        with:
+          expected-base-branch-prefix: main
+          expected-head-branch-prefix: patch-v
+      
+      - name: Submit OTA if coming from patch branch
+        if: steps.check-merged-pr.outputs.result == 'true'
+        uses: ./.github/actions/submit-ota
+        with:
+          expo-token: ${{ secrets.EXPO_TOKEN }}
+          release-channel: production
+          release-message: ${{ github.event.pull_request.title }}
