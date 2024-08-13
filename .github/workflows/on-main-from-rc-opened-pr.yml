@@ -14,16 +14,17 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      # Check if head branch is rc branch
 
       - name: Submit Staging Build
-        if: startsWith(github.ref, 'refs/heads/rc-v')
+        if: startsWith(github.head_ref, 'refs/heads/rc-v')
         uses: ./.github/actions/submit-build
         with:
           expo-token: ${{ secrets.EXPO_TOKEN }}
           release-channel: staging
 
       - name: Increment build number
-        if: startsWith(github.ref, 'refs/heads/rc-v')
+        if: startsWith(github.head_ref, 'refs/heads/rc-v')
         uses: ./.github/actions/increment-version
         with:
           increment-build-number: true
