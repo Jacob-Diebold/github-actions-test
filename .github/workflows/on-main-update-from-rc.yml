@@ -51,7 +51,7 @@ jobs:
         with:
           branch-name: rc-v${{ steps.get-incremented-version.outputs.new-version }}
           base-branch: main
-          github-token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set new release candidate version
         if: steps.check-merged-pr.outputs.result == 'true'
