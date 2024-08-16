@@ -26,6 +26,6 @@ jobs:
         if: steps.check-merged-pr.outputs.result == 'true'
         uses: ./.github/actions/submit-ota
         with:
-          expo-token: ${{ secrets.EXPO_TOKEN }}
+          expo-token: ${{ secrets.EXPO_ACCESS_TOKEN }}
           release-channel: production
           release-message: ${{ github.event.pull_request.title }}

@@ -26,7 +26,7 @@ jobs:
         if: steps.check-merged-pr.outputs.result == 'true'
         uses: ./.github/actions/submit-build
         with:
-          expo-token: ${{ secrets.EXPO_TOKEN }}
+          expo-token: ${{ secrets.EXPO_ACCESS_TOKEN }}
           release-channel: production
 
       - name: Get current version and build number
@@ -55,7 +55,7 @@ jobs:
           github-admin-token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
           branch-to-push-changes-to: develop
           version: ${{ steps.get-incremented-version.outputs.new-version }}
-          build-number: 0
+          build-number: 1
       
       - name: Checkout code
         uses: actions/checkout@v4
@@ -75,5 +75,5 @@ jobs:
           github-admin-token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
           branch-to-push-changes-to: rc-v${{ steps.get-incremented-version.outputs.new-version }}
           version: ${{ steps.get-incremented-version.outputs.new-version }}
-          build-number: 0
+          build-number: 1
       

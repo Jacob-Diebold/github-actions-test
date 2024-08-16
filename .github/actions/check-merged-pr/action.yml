@@ -45,8 +45,3 @@ runs:
       if: steps.check-base.outcome == 'success' && steps.check-head.outcome == 'success' && steps.check-merged.outcome == 'success'
       run: echo "result=true" >> $GITHUB_OUTPUT
       shell: bash
-
-    # - name: Set output to false (if previous checks failed)
-    #   if: steps.set-output.outcome != 'success'
-    #   run: echo "result=false" >> $GITHUB_OUTPUT
-    #   shell: bash

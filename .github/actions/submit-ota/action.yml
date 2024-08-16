@@ -11,16 +11,25 @@ inputs:
   release-message:
     description: The release message to include in the update
     required: true
+  amplify-access-key:
+    description: The Amplify access key
+    required: true
+  amplify-secret-key:
+    description: The Amplify secret key
+    required: true
+  amplify-env:
+    description: The Amplify environment
+    required: true
 
 
 
 runs:
   using: composite
   steps:
-    - name: Check for EXPO_TOKEN
+    - name: Check for EXPO_ACCESS_TOKEN
       run: |
         if [ -z "${{ inputs.expo-token }}" ]; then
-            echo "You must provide an EXPO_TOKEN secret linked to this project's Expo account in this repo's secrets. Learn more: https://docs.expo.dev/eas-update/github-actions"
+            echo "You must provide an EXPO_ACCESS_TOKEN secret linked to this project's Expo account in this repo's secrets. Learn more: https://docs.expo.dev/eas-update/github-actions"
             exit 1
           fi
       shell: bash
@@ -28,24 +37,64 @@ runs:
       uses: actions/setup-node@v4
       with:
         node-version-file: ".nvmrc"
+    
+    - name: Install Amplify CLI
+      run: npm i -g @aws-amplify/cli
+      shell: bash
 
-    # TODO: Uncomment
-    # - name: Setup EAS
-    #   uses: expo/expo-github-action@v8
-    #   with:
-    #     eas-version: latest
-    #     token: ${{ inputs.expo-token }}
+    - name: Configure Amplify
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-region: us-east-2
+        aws-access-key-id: ${{ inputs.amplify-access-key }}
+        aws-secret-access-key: ${{ inputs.amplify-secret-key }}
+
+    - name: Pull Amplify Environment
+      run: |
+        AWSCLOUDFORMATIONCONFIG="{\
+        \"configLevel\":\"project\",\
+        \"useProfile\":false,\
+        \"profileName\":\"default\",\
+        \"accessKeyId\":\"${{ inputs.amplify-access-key }}\",\
+        \"secretAccessKey\":\"${{ inputs.amplify-secret-key }}\",\
+        \"region\":\"us-east-2\"\
+        }"
+        PROVIDERS="{\
+        \"awscloudformation\":$AWSCLOUDFORMATIONCONFIG\
+        }"
+        amplify pull --yes --envName ${{ inputs.amplify-env }} --appId dh8j1g407qlak --providers $PROVIDERS
+      shell: bash
+
+    - name: Setup EAS
+      uses: expo/expo-github-action@v8
+      with:
+        eas-version: latest
+        token: ${{ inputs.expo-token }}
     
     - name: Install dependencies
       run: npm i --no-audit --no-fund
       shell: bash
 
-    # TODO: REMOVE TEMP LOG MESSAGE
+    - name: Create an env file based on the env from eas.json
+      run: jq -r --arg channel "${{inputs.release-channel}}" '.build[$channel].env | to_entries[] | "\(.key)=\(.value)"' eas.json > .env
+      shell: bash
+
     - name: Log the release message
       run: echo "Submit OTA -> channel-${{ inputs.release-channel }}, message-${{ inputs.release-message }}"
       shell: bash
-      
-    # TODO: Uncomment
-    # - name: Submit OTA
-    #   run: npm run eas update --channel ${{ inputs.release-channel }} --message "${{ inputs.release-message }}"
-    #   shell: bash
+    
+    - name: Log the contents of the .env file
+      run: cat .env
+      shell: bash
+
+    - name: Log the contents of the src/aws-exports.js file
+      run: cat src/aws-exports.js
+      shell: bash
+
+    - name: Copy the contents of the src/aws-exports.js file to src/aws-exports-[env].js
+      run: cp src/aws-exports.js src/aws-exports-${{ inputs.amplify-env }}.js
+      shell: bash
+    
+    - name: Submit OTA
+      run: eas update --channel ${{ inputs.release-channel }} --message "${{ inputs.release-message }}"
+      shell: bash
