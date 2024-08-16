@@ -27,7 +27,7 @@ runs:
     - name: Get current version and build number
       id: get-current-version-info
       uses: ./.github/actions/get-current-version-info
-
+      
     - name: Get new version
       if: inputs.increment-version == 'true'
       id: get-new-version
