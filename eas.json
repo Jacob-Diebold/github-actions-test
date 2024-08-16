@@ -1,0 +1,58 @@
+{
+  "cli": {
+    "version": ">= 3.10.0"
+  },
+  "build": {
+    "develop": {
+      "channel": "develop",
+      "env": {
+        "EXPO_PUBLIC_ENVIRONMENT": "dev",
+        "EXPO_PUBLIC_IS_RELEASED": "true",
+        "EXPO_PUBLIC_REALM_ID": "1"
+      },
+      "autoIncrement": true,
+      "ios": {
+        "image": "latest",
+        "resourceClass": "large"
+      }
+    },
+    "staging": {
+      "channel": "staging",
+      "env": {
+        "EXPO_PUBLIC_ENVIRONMENT": "staging",
+        "EXPO_PUBLIC_IS_RELEASED": "true",
+        "EXPO_PUBLIC_REALM_ID": "2"
+      },
+      "autoIncrement": true,
+      "ios": {
+        "image": "latest",
+        "resourceClass": "large"
+      }
+    },
+    "production": {
+      "channel": "production",
+      "env": {
+        "EXPO_PUBLIC_ENVIRONMENT": "prod",
+        "EXPO_PUBLIC_IS_RELEASED": "true",
+        "EXPO_PUBLIC_REALM_ID": "3"
+      },
+      "autoIncrement": true,
+      "ios": {
+        "image": "latest",
+        "resourceClass": "large"
+      }
+    }
+  },
+  "submit": {
+    "production": {
+      "ios": {
+        "appleId": "1",
+        "ascAppId": "2",
+        "appleTeamId": "3"
+      }
+    },
+    "develop": {
+      "extends": "production"
+    }
+  }
+}

@@ -24,11 +24,11 @@ runs:
       with:
         node-version-file: ".nvmrc"
 
-    - name: Setup Expo & EAS
-      uses: expo/expo-github-action@v8
-      with:
-        eas-version: latest
-        token: ${{ inputs.expo-token }}
+    # - name: Setup Expo & EAS
+    #   uses: expo/expo-github-action@v8
+    #   with:
+    #     eas-version: latest
+    #     token: ${{ inputs.expo-token }}
     
     - name: Install dependencies
       run: npm i --no-audit --no-fund
@@ -38,6 +38,6 @@ runs:
       run: echo "Submit Build -> channel-${{ inputs.release-channel }}"
       shell: bash
 
-    - name: Submit Build
-      run: eas build -e ${{ inputs.release-channel }} -p ios --auto-submit --no-wait --non-interactive
-      shell: bash
+    # - name: Submit Build
+    #   run: eas build -e ${{ inputs.release-channel }} -p ios --auto-submit --no-wait --non-interactive
+    #   shell: bash
