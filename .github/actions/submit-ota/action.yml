@@ -42,34 +42,34 @@ runs:
       run: npm i -g @aws-amplify/cli
       shell: bash
 
-    - name: Configure Amplify
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        aws-region: us-east-2
-        aws-access-key-id: ${{ inputs.amplify-access-key }}
-        aws-secret-access-key: ${{ inputs.amplify-secret-key }}
+    # - name: Configure Amplify
+    #   uses: aws-actions/configure-aws-credentials@v4
+    #   with:
+    #     aws-region: us-east-2
+    #     aws-access-key-id: ${{ inputs.amplify-access-key }}
+    #     aws-secret-access-key: ${{ inputs.amplify-secret-key }}
 
-    - name: Pull Amplify Environment
-      run: |
-        AWSCLOUDFORMATIONCONFIG="{\
-        \"configLevel\":\"project\",\
-        \"useProfile\":false,\
-        \"profileName\":\"default\",\
-        \"accessKeyId\":\"${{ inputs.amplify-access-key }}\",\
-        \"secretAccessKey\":\"${{ inputs.amplify-secret-key }}\",\
-        \"region\":\"us-east-2\"\
-        }"
-        PROVIDERS="{\
-        \"awscloudformation\":$AWSCLOUDFORMATIONCONFIG\
-        }"
-        amplify pull --yes --envName ${{ inputs.amplify-env }} --appId dh8j1g407qlak --providers $PROVIDERS
-      shell: bash
+    # - name: Pull Amplify Environment
+    #   run: |
+    #     AWSCLOUDFORMATIONCONFIG="{\
+    #     \"configLevel\":\"project\",\
+    #     \"useProfile\":false,\
+    #     \"profileName\":\"default\",\
+    #     \"accessKeyId\":\"${{ inputs.amplify-access-key }}\",\
+    #     \"secretAccessKey\":\"${{ inputs.amplify-secret-key }}\",\
+    #     \"region\":\"us-east-2\"\
+    #     }"
+    #     PROVIDERS="{\
+    #     \"awscloudformation\":$AWSCLOUDFORMATIONCONFIG\
+    #     }"
+    #     amplify pull --yes --envName ${{ inputs.amplify-env }} --appId dh8j1g407qlak --providers $PROVIDERS
+    #   shell: bash
 
-    - name: Setup EAS
-      uses: expo/expo-github-action@v8
-      with:
-        eas-version: latest
-        token: ${{ inputs.expo-token }}
+    # - name: Setup EAS
+    #   uses: expo/expo-github-action@v8
+    #   with:
+    #     eas-version: latest
+    #     token: ${{ inputs.expo-token }}
     
     - name: Install dependencies
       run: npm i --no-audit --no-fund
@@ -95,6 +95,6 @@ runs:
       run: cp src/aws-exports.js src/aws-exports-${{ inputs.amplify-env }}.js
       shell: bash
     
-    - name: Submit OTA
-      run: eas update --channel ${{ inputs.release-channel }} --message "${{ inputs.release-message }}"
-      shell: bash
+    # - name: Submit OTA
+    #   run: eas update --channel ${{ inputs.release-channel }} --message "${{ inputs.release-message }}"
+    #   shell: bash
