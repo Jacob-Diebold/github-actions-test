@@ -59,6 +59,13 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github-token }}
       shell: bash
 
+    - name: Rebase base branch to ensure linear history
+      if: steps.check-branch-exists.outputs.result == 'false'
+      run: git rebase origin/${{inputs.base-branch}}
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+      shell: bash
+
     - name: Push branch
       if: steps.check-branch-exists.outputs.result == 'false'
       run: git push -u origin ${{inputs.branch-name}}
