@@ -3,19 +3,14 @@
 ## Summary
 
 ### Description
-
 <!-- Write a brief description of the changes introduced by this PR -->
 
 ### Changes
-
 <!-- List out the changes -->
-
 <!-- - tls-111(fix): Fixed xyz -->
 
 ## Testing
-
 <!-- List out all tests performed on this rc build -->
-
 <!-- - [ ] Tested change from commit xyz -->
 
 ## Checklist

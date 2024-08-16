@@ -29,6 +29,7 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
       shell: bash
+      
 
     - name: Fetch origin
       if: steps.check-branch-exists.outputs.result == 'false'
