@@ -1,21 +1,17 @@
-<!-- Use this PR template for any manual PRs requesting to pull changes from a feature/hotfix branch into the develop/patch branch -->
+<!-- Use this PR template for any manual PRs requesting to pull changes from a feature/hotfix branch into the release candidate/patch branch -->
 
 # HEAD_BRANCH -> BASE_BRANCH
 
 ## Summary
 
 ### Description
-
 <!-- Write a brief description of the changes introduced by this PR -->
 
 ### Changes
-
 <!-- List out the changes -->
-
 <!-- - tls-111(fix): Fixed xyz -->
 
 ## Testing
-
 <!-- How do you know this is working? What should a reviewer look for? What steps can be taken to replicate and test the changes? Provide a screenshot if your change is visual.-->
 
 ## Checklist

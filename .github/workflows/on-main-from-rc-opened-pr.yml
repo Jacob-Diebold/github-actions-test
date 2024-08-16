@@ -19,7 +19,7 @@ jobs:
         if: startsWith(github.head_ref, 'rc-v')
         uses: ./.github/actions/submit-build
         with:
-          expo-token: ${{ secrets.EXPO_TOKEN }}
+          expo-token: ${{ secrets.EXPO_ACCESS_TOKEN }}
           release-channel: staging
 
       - name: Checkout head branch
