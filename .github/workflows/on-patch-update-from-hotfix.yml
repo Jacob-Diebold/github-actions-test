@@ -44,6 +44,6 @@ jobs:
         if: steps.check-merged-pr.outputs.result == 'true'
         with:
           template: .github/templates/PATCH_MAIN_PR.md
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
           base-branch: main
           branch-with-changes: ${{ github.ref_name }}
